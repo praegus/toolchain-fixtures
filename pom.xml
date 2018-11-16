@@ -4,7 +4,7 @@
 
     <groupId>nl.praegus</groupId>
     <artifactId>toolchain-fixtures</artifactId>
-    <version>1.0</version>
+    <version>1.1-SNAPSHOT</version>
 
        <dependencies>
         <dependency>
@@ -91,7 +91,7 @@
         <connection>scm:git:git@gitlab.com:praegus/toolchain-projects/toolchain-fitnesse-plugin.git</connection>
         <url>https://gitlab.com/praegus/toolchain-projects/toolchain-fitnesse-plugin.git</url>
         <developerConnection>scm:git:git@gitlab.com:praegus/toolchain-projects/toolchain-fitnesse-plugin.git</developerConnection>
-        <tag>toolchain-fixtures-1.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <profiles>
