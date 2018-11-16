@@ -90,9 +90,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git@gitlab.com:praegus/toolchain-projects/toolchain-fitnesse-plugin.git</connection>
-        <url>https://gitlab.com/praegus/toolchain-projects/toolchain-fitnesse-plugin.git</url>
-        <developerConnection>scm:git:git@gitlab.com:praegus/toolchain-projects/toolchain-fitnesse-plugin.git</developerConnection>
+        <connection>scm:git:git@gitlab.com:praegus/praegus-toolchain-fixtures.git</connection>
+        <url>https://gitlab.com/praegus/praegus-toolchain-fixtures.git</url>
+        <developerConnection>scm:git:git@gitlab.com:praegus/praegus-toolchain-fixtures.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
 
