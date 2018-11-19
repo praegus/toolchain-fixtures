@@ -36,6 +36,21 @@ public class MendixBrowserTest extends BrowserTest<WebElement> {
         return inputDelay;
     }
 
+    @Override
+    public void setBrowserSizeToMaximum() {
+        try {
+            super.setBrowserSizeToMaximum();
+        } catch (WebDriverException e) {
+            try{
+                setBrowserHeight(900);
+                setBrowserWidth(1800);
+                System.out.println("Tried to maximize a browser that didn't allow that, tried setting 1800x900 now");
+            } catch (WebDriverException f) {
+                System.out.println("Resizing not allowed, mobile device?");
+            }
+        }
+    }
+
     @WaitUntil(TimeoutPolicy.RETURN_NULL)
     public Integer numberOfItems(String xPath) {
         if (xPath.startsWith("xpath=")) {
