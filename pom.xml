@@ -9,6 +9,26 @@
     <description>Extensions on existing fixtures to aid in automated testing</description>
     <version>1.2-SNAPSHOT</version>
 
+    <repositories>
+        <repository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>bintray-epam-reportportal</id>
+            <name>bintray</name>
+            <url>http://dl.bintray.com/epam/reportportal</url>
+        </repository>
+    </repositories>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>2.9.5</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
        <dependencies>
         <dependency>
             <groupId>com.github.tcnh</groupId>
@@ -26,6 +46,13 @@
             <groupId>com.jcraft</groupId>
             <artifactId>jsch</artifactId>
             <version>0.1.54</version>
+        </dependency>
+
+         <!-- ReportPortal -->
+        <dependency>
+           <groupId>com.epam.reportportal</groupId>
+           <artifactId>agent-java-junit</artifactId>
+           <version>2.7.2</version>
         </dependency>
 
         <dependency>
