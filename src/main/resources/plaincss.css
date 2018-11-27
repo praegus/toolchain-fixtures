@@ -245,12 +245,64 @@ label {
   display: inline-block;
 }
 
+tr.scenario, img {
+  cursor: pointer;
+}
+
 tr.scenario > td:first-child {
   background-position: 2px 7px;
 }
 tr.scenario.closed > td:first-child {
   padding-left: 18px;
 }
+
+.closed-detail {
+    display: none;
+}
+
+/** Collapsible section */
+.collapsible {
+  margin: 0;
+  margin-bottom: 10px;
+  background-color: #ffffff;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+  border-color: #dddddd;
+  padding: 0;
+  margin-bottom: 5px;
+  background-color: #595959;
+  border-color: #666 !important;
+}
+
+.collapsible.closed > div {
+  display: none;
+}
+.collapsible.invisible {
+  display: none;
+}
+.collapsible p.title,
+.collapsible.closed p.title {
+  border-top-right-radius: 3px;
+  border-top-left-radius: 3px;
+  color: #cccccc;
+  background-color: #f5f5f5;
+  border-color: #dddddd;
+  padding: 5px;
+  border-color: #909090;
+  background-color: #595959;
+  margin: 3px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 1.4em;
+  font-style: italic;
+  }
+
+.collapsible > ul {
+    display: none;
+}
+
 .pass,
 span.pass * {
   background-color: #449d44;

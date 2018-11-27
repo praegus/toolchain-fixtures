@@ -4,11 +4,19 @@ import fitnesse.testsystems.*;
 import nl.praegus.fitnesse.junit.testsystemlisteners.util.OutputChunkParser;
 
 import java.io.Closeable;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.util.Locale;
 
 public class ConsoleLogListener implements TestSystemListener, Closeable {
     private final String NEWLINE = System.getProperty("line.separator");
     private final OutputChunkParser parser = new OutputChunkParser();
-
+    private final DateTimeFormatter timeFmt =
+            DateTimeFormatter.ofLocalizedDateTime( FormatStyle.SHORT )
+                    .withLocale( Locale.getDefault() )
+                    .withZone( ZoneId.systemDefault() );
 
     @Override
     public void testSystemStarted(TestSystem testSystem) {
@@ -32,7 +40,7 @@ public class ConsoleLogListener implements TestSystemListener, Closeable {
 
     @Override
     public void testStarted(TestPage testPage) {
-        System.out.println("\r\nTest Started: " + testPage.getFullPath());
+        System.out.println("\r\n" + timeFmt.format(Instant.now()) + " - Test Started: " + testPage.getFullPath());
     }
 
     @Override
@@ -42,7 +50,6 @@ public class ConsoleLogListener implements TestSystemListener, Closeable {
 
     @Override
     public void testSystemStopped(TestSystem testSystem, Throwable cause) {
-        //System.setOut(defaultSysOut);
     }
 
     @Override

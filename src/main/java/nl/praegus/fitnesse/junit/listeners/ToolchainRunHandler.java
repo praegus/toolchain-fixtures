@@ -20,7 +20,7 @@ import com.google.inject.Inject;
 import fitnesse.junit.FitNessePageAnnotation;
 import fitnesse.wiki.WikiPage;
 import nl.hsac.fitnesse.fixture.Environment;
-import nl.praegus.fitnesse.junit.testsystemlisteners.PlainHtmlListener;
+import nl.praegus.fitnesse.junit.testsystemlisteners.StandaloneHtmlListener;
 import org.apache.commons.io.FilenameUtils;
 import org.junit.runner.Description;
 import org.junit.runner.notification.Failure;
@@ -79,7 +79,6 @@ public class ToolchainRunHandler implements IListenerHandler {
             } catch (Exception e) {
                 handleException(e, logger, "Unable start the launch: '" + launchName + "'");
             }
-            System.out.println("Launched " + launchName);
         }
     }
 
@@ -93,7 +92,6 @@ public class ToolchainRunHandler implements IListenerHandler {
             } catch (Exception e) {
                 handleException(e, logger, "Unable finish the launch: '" + launchName + "'");
             }
-            System.out.println("Finished Launch " + launchName);
         }
     }
 
@@ -122,7 +120,6 @@ public class ToolchainRunHandler implements IListenerHandler {
         } catch (Exception e) {
             handleException(e, logger, "Unable start test: '" + getFullTestName(description) + "'");
         }
-        System.out.println("Started " + getFullTestName(description));
     }
 
     @Override
@@ -146,7 +143,6 @@ public class ToolchainRunHandler implements IListenerHandler {
         } catch (Exception e) {
             handleException(e, logger, "Unable finish test: '" + getFullTestName(description) + "'");
         }
-        System.out.println("Stopped " + getFullTestName(description));
     }
 
     @Override
@@ -182,7 +178,6 @@ public class ToolchainRunHandler implements IListenerHandler {
             } catch (Exception e) {
                 handleException(e, logger, "Unable start test suite: '" + suiteName + "'");
             }
-            System.out.println("Started Suite " + suiteName);
         }
     }
 
@@ -203,7 +198,6 @@ public class ToolchainRunHandler implements IListenerHandler {
             } catch (Exception e) {
                 handleException(e, logger, "Unable finish test suite: '" + suiteName + "'");
             }
-        System.out.println("Stopped Suite " + suiteName);
     }
 
     void stopAllSuites() {
@@ -220,7 +214,6 @@ public class ToolchainRunHandler implements IListenerHandler {
         } catch (Exception e) {
             handleException(e, logger, "Unable finish test suite: '" + context.getSuiteName(suiteId) + "'");
         }
-        System.out.println("Stopped Suite " + context.getSuiteName(suiteId));
     }
 
     @Override
@@ -256,7 +249,6 @@ public class ToolchainRunHandler implements IListenerHandler {
         } catch (Exception e) {
             handleException(e, logger, "Unable skip test: '" + getTestName(description) + "'");
         }
-        System.out.println("Skipped " + getTestName(description));
     }
 
     @Override
@@ -291,7 +283,7 @@ public class ToolchainRunHandler implements IListenerHandler {
     }
 
     private void sendPlainHtmlLog(Description description) {
-        ByteSource attachmentSource = ByteSource.wrap(PlainHtmlListener.output.toString().getBytes());
+        ByteSource attachmentSource = ByteSource.wrap(StandaloneHtmlListener.output.toString().getBytes());
         SaveLogRQ.File attachmentFile = new SaveLogRQ.File();
         attachmentFile.setContent(attachmentSource);
         attachmentFile.setName("Plain HTML Report");

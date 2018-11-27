@@ -6,7 +6,7 @@ import fitnesse.wiki.WikiPage;
 import nl.hsac.fitnesse.junit.HsacFitNesseRunner;
 import nl.praegus.fitnesse.junit.listeners.ToolchainReportPortalListener;
 import nl.praegus.fitnesse.junit.testsystemlisteners.ConsoleLogListener;
-import nl.praegus.fitnesse.junit.testsystemlisteners.PlainHtmlListener;
+import nl.praegus.fitnesse.junit.testsystemlisteners.StandaloneHtmlListener;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.model.InitializationError;
 
@@ -19,10 +19,9 @@ public class ToolchainTestRunner extends HsacFitNesseRunner {
         System.getProperties().setProperty("nodebug", "true");
     }
 
-    //Add the reportportal listener to generate tehe right output
+
     @Override
     protected void runPages(List<WikiPage> pages, RunNotifier notifier) {
-        notifier.addListener(new ToolchainReportPortalListener());
         super.runPages(pages, notifier);
     }
 
@@ -31,6 +30,6 @@ public class ToolchainTestRunner extends HsacFitNesseRunner {
     protected void addTestSystemListeners(RunNotifier notifier, MultipleTestsRunner testRunner, Class<?> suiteClass, DescriptionFactory descriptionFactory) {
         super.addTestSystemListeners(notifier, testRunner, suiteClass, descriptionFactory);
         testRunner.addTestSystemListener(new ConsoleLogListener());
-        testRunner.addTestSystemListener(new PlainHtmlListener());
+        testRunner.addTestSystemListener(new StandaloneHtmlListener());
     }
 }

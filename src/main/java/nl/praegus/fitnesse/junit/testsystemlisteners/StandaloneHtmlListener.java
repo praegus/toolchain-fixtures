@@ -1,15 +1,13 @@
 package nl.praegus.fitnesse.junit.testsystemlisteners;
 
+import com.google.common.io.ByteStreams;
 import fitnesse.testsystems.*;
 import nl.praegus.fitnesse.junit.testsystemlisteners.util.OutputChunkParser;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
-public class PlainHtmlListener implements TestSystemListener, Closeable {
+public class StandaloneHtmlListener implements TestSystemListener, Closeable {
     public static StringBuilder output = new StringBuilder();
     private OutputChunkParser parser = new OutputChunkParser();
 
@@ -20,7 +18,6 @@ public class PlainHtmlListener implements TestSystemListener, Closeable {
 
     @Override
     public void testOutputChunk(String chunk) {
-        chunk = parser.filterCollapsedSections(chunk);
         if(!chunk.isEmpty()) {
             chunk = parser.embedImages(chunk);
         }
@@ -30,12 +27,12 @@ public class PlainHtmlListener implements TestSystemListener, Closeable {
     @Override
     public void testStarted(TestPage testPage) {
 
-        String css = new String(getBytesForResource("plaincss.css"));
-        String js = new String(getBytesForResource("javascript.js"));
+        String css = new String(getBytesForResource("/plaincss.css"));
+        String js = new String(getBytesForResource("/javascript.js"));
         output = new StringBuilder();
         output.append("<html>").append("<head>")
                 .append("<style>" + css + "</style>")
-                .append("</head><body>")
+                .append("</head><body onload=\"enableClickHandlers()\">")
                 .append("<script>\r\n" + js + "\r\n</script>")
                 .append("<h1>" + testPage.getFullPath() + "</h1>");
     }
@@ -43,9 +40,7 @@ public class PlainHtmlListener implements TestSystemListener, Closeable {
     private byte[] getBytesForResource(String resource) {
         byte[] result;
         try {
-            Path path = Paths.get(getClass().getClassLoader()
-                    .getResource(resource).toURI());
-            result = Files.readAllBytes(path);
+            result = ByteStreams.toByteArray(getClass().getResourceAsStream(resource));
         } catch (Exception e) {
             e.printStackTrace();
             result = "".getBytes();
