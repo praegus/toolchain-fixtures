@@ -7,6 +7,16 @@ import nl.praegus.fitnesse.junit.testsystemlisteners.util.OutputChunkParser;
 import java.io.Closeable;
 import java.io.IOException;
 
+/*
+ TestSystemListener that keeps a static StringBuilder for the running testcase
+ The sb contains all the concatenated output chunks that are returned from the test system.
+ The html contained in the sb is standalone. No external resources are required. CSS, JS and
+ images (such as screen shots) are embedded in the page.
+
+ To obtain the html, simply call StandaloneHtmlListener.output from your testrunlistener.
+ Note: this cass is not usable when doing parallel execution from the same workspace.
+ */
+
 public class StandaloneHtmlListener implements TestSystemListener, Closeable {
     public static StringBuilder output = new StringBuilder();
     private OutputChunkParser parser = new OutputChunkParser();
@@ -30,11 +40,17 @@ public class StandaloneHtmlListener implements TestSystemListener, Closeable {
         String css = new String(getBytesForResource("/plaincss.css"));
         String js = new String(getBytesForResource("/javascript.js"));
         output = new StringBuilder();
-        output.append("<html>").append("<head>")
-                .append("<style>" + css + "</style>")
-                .append("</head><body onload=\"enableClickHandlers()\">")
-                .append("<script>\r\n" + js + "\r\n</script>")
-                .append("<h1>" + testPage.getFullPath() + "</h1>");
+        output.append("<html>\r\n")
+                .append("<head>\r\n")
+                .append("<style>\r\n")
+                .append(css)
+                .append("\r\n</style>\r\n")
+                .append("</head>\r\n")
+                .append("<body onload=\"enableClickHandlers()\">\r\n")
+                .append("<script>\r\n")
+                .append(js)
+                .append("\r\n</script>\r\n")
+                .append("<h1>").append(testPage.getFullPath()).append("</h1>\r\n");
     }
 
     private byte[] getBytesForResource(String resource) {
