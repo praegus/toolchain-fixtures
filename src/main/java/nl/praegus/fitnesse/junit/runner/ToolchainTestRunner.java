@@ -4,9 +4,7 @@ import fitnesse.junit.DescriptionFactory;
 import fitnesse.testrunner.MultipleTestsRunner;
 import fitnesse.wiki.WikiPage;
 import nl.hsac.fitnesse.junit.HsacFitNesseRunner;
-import nl.praegus.fitnesse.junit.listeners.ToolchainReportPortalListener;
 import nl.praegus.fitnesse.junit.testsystemlisteners.ConsoleLogListener;
-import nl.praegus.fitnesse.junit.testsystemlisteners.StandaloneHtmlListener;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.model.InitializationError;
 
@@ -30,6 +28,5 @@ public class ToolchainTestRunner extends HsacFitNesseRunner {
     protected void addTestSystemListeners(RunNotifier notifier, MultipleTestsRunner testRunner, Class<?> suiteClass, DescriptionFactory descriptionFactory) {
         super.addTestSystemListeners(notifier, testRunner, suiteClass, descriptionFactory);
         testRunner.addTestSystemListener(new ConsoleLogListener());
-        testRunner.addTestSystemListener(new StandaloneHtmlListener());
     }
 }

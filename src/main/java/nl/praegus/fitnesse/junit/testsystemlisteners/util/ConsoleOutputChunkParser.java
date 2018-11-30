@@ -10,7 +10,7 @@ import java.util.Base64;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class OutputChunkParser {
+public class ConsoleOutputChunkParser {
 
     private final String NEWLINE = System.getProperty("line.separator");
 
@@ -32,36 +32,6 @@ public class OutputChunkParser {
         }
 
         return html;
-    }
-
-    public String embedImages(String html) {
-
-        final Pattern imgPattern = Pattern.compile("<img(\\s+.*?)?\\s+src=\"(.*?)\".*?/>", Pattern.CASE_INSENSITIVE);
-        html = html.replaceAll("<a.+?>(.+?)</a>", "$1");
-        Matcher imgMatcher = imgPattern.matcher(html);
-        while (imgMatcher.find()) {
-            String src = imgMatcher.group(2);
-            String root = Environment.getInstance().getFitNesseRootDir();
-            String img = root + "/" + src;
-            File imageFile = new File(img);
-            html = imgMatcher.replaceAll("<img src=\"data:image/png;base64," + encodeFile(imageFile) + "\" width=\"200\" onClick=\"openImage(this)\">");
-        }
-        return html;
-    }
-
-    private String encodeFile(File file) {
-        String base64Image = "";
-        try (FileInputStream imageInFile = new FileInputStream(file)) {
-            // Reading a Image file from file system
-            byte imageData[] = new byte[(int) file.length()];
-            imageInFile.read(imageData);
-            base64Image = Base64.getEncoder().encodeToString(imageData);
-        } catch (FileNotFoundException e) {
-            System.out.println("Image not found" + e);
-        } catch (IOException ioe) {
-            System.out.println("Exception while reading the Image " + ioe);
-        }
-        return base64Image;
     }
 
     public String formatHtmlForConsole(String html) {

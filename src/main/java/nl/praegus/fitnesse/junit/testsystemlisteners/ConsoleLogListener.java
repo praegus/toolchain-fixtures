@@ -1,7 +1,7 @@
 package nl.praegus.fitnesse.junit.testsystemlisteners;
 
 import fitnesse.testsystems.*;
-import nl.praegus.fitnesse.junit.testsystemlisteners.util.OutputChunkParser;
+import nl.praegus.fitnesse.junit.testsystemlisteners.util.ConsoleOutputChunkParser;
 
 import java.io.Closeable;
 import java.time.Instant;
@@ -12,7 +12,7 @@ import java.util.Locale;
 
 public class ConsoleLogListener implements TestSystemListener, Closeable {
     private final String NEWLINE = System.getProperty("line.separator");
-    private final OutputChunkParser parser = new OutputChunkParser();
+    private final ConsoleOutputChunkParser parser = new ConsoleOutputChunkParser();
     private final DateTimeFormatter timeFmt =
             DateTimeFormatter.ofLocalizedDateTime( FormatStyle.SHORT )
                     .withLocale( Locale.getDefault() )
