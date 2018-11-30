@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>nl.praegus</groupId>
@@ -8,7 +7,7 @@
     <url>https://gitlab.com/praegus/praegus-toolchain-fixtures</url>
     <name>Praegus Toolchain extended fixture pack</name>
     <description>Extensions on existing fixtures to aid in automated testing</description>
-    <version>1.5-SNAPSHOT</version>
+    <version>1.5</version>
 
     <dependencyManagement>
         <dependencies>
@@ -16,6 +15,11 @@
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-annotations</artifactId>
                 <version>2.9.5</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>27.0-jre</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -114,7 +118,7 @@
         <connection>scm:git:git@gitlab.com:praegus/praegus-toolchain-fixtures.git</connection>
         <url>https://gitlab.com/praegus/praegus-toolchain-fixtures.git</url>
         <developerConnection>scm:git:git@gitlab.com:praegus/praegus-toolchain-fixtures.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>toolchain-fixtures-1.5</tag>
     </scm>
 
     <profiles>
