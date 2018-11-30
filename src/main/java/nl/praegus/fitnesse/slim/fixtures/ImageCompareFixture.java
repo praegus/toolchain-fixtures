@@ -1,4 +1,4 @@
-package nl.praegus.fitnesse.fixture.slim;
+package nl.praegus.fitnesse.slim.fixtures;
 
 import com.galenframework.rainbow4j.ComparisonOptions;
 import com.galenframework.rainbow4j.ImageCompareResult;
