@@ -7,7 +7,7 @@
     <url>https://gitlab.com/praegus/praegus-toolchain-fixtures</url>
     <name>Praegus Toolchain extended fixture pack</name>
     <description>Extensions on existing fixtures to aid in automated testing</description>
-    <version>1.4</version>
+    <version>1.5-SNAPSHOT</version>
 
     <dependencyManagement>
         <dependencies>
@@ -108,7 +108,7 @@
         <connection>scm:git:git@gitlab.com:praegus/praegus-toolchain-fixtures.git</connection>
         <url>https://gitlab.com/praegus/praegus-toolchain-fixtures.git</url>
         <developerConnection>scm:git:git@gitlab.com:praegus/praegus-toolchain-fixtures.git</developerConnection>
-        <tag>toolchain-fixtures-1.4</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <profiles>
