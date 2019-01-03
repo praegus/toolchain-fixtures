@@ -1,6 +1,5 @@
 package nl.praegus.fitnesse.slim.fixtures.web;
 
-import net.lightbody.bmp.BrowserMobProxy;
 import net.lightbody.bmp.BrowserMobProxyServer;
 import net.lightbody.bmp.core.har.Har;
 import net.lightbody.bmp.core.har.HarNameValuePair;
@@ -9,27 +8,48 @@ import nl.hsac.fitnesse.fixture.slim.JsonFixture;
 import nl.hsac.fitnesse.fixture.slim.SlimFixtureException;
 import org.json.JSONObject;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 
 public class XhrTest extends JsonFixture {
-    private static BrowserMobProxy proxy = new BrowserMobProxyServer();
-    private static String endpoint;
+    private static BrowserMobProxyServer proxy = new BrowserMobProxyServer();
+    private String endpoint = "";
+    private String customFilter = "";
 
     public XhrTest(String domain, String endpoint) {
         startProxyOnFor(domain, endpoint);
     }
 
     public XhrTest() {
+        if(!proxy.isStarted()) {
+            startProxyOnFor("","");
+        }
+    }
+
+    public void filterHarBy(String filter) {
+        customFilter = filter;
     }
 
     public void startProxyOnFor(String domain, String endpoint) {
-        this.endpoint = endpoint; //We should find a better solution for this
-        proxy.start(0);
-        proxy.enableHarCaptureTypes(CaptureType.REQUEST_CONTENT);
-        proxy.newHar(cleanupValue(domain));
+        this.endpoint = endpoint;
+        if(proxy.isStarted()) {
+            proxy.endHar();
+            newHarForDomain(domain);
+        } else {
+            proxy.start();
+            proxy.enableHarCaptureTypes(CaptureType.REQUEST_CONTENT);
+            if(cleanupValue(domain).isEmpty()) {
+                proxy.newHar();
+            } else {
+                proxy.newHar(cleanupValue(domain));
+            }
+        }
+    }
+
+    public void newHarForDomain(String domain) {
+        proxy.newHar(domain);
     }
 
     public int getProxyPort() {
@@ -37,7 +57,13 @@ public class XhrTest extends JsonFixture {
     }
 
     private void filterHar(Har har) {
-        har.getLog().getEntries().removeIf(x -> !x.getRequest().getUrl().replaceAll("\\?.*", "").endsWith(endpoint));
+        if(customFilter.isEmpty()) {
+            har.getLog().getEntries()
+                    .removeIf(x -> !x.getRequest().getUrl().replaceAll("\\?.*", "").endsWith(endpoint));
+        } else {
+            har.getLog().getEntries()
+                    .removeIf(x -> !x.getRequest().getUrl().contains(customFilter));
+        }
     }
 
     public String saveHarTo(String fileName) {
@@ -47,20 +73,28 @@ public class XhrTest extends JsonFixture {
         try {
             File harFile = new File(filepath);
             har.writeTo(harFile);
+            loadFile(harFile.getAbsolutePath());
             return harFile.getAbsolutePath();
         } catch (IOException e) {
             throw new SlimFixtureException(e);
         }
     }
 
-    public boolean usePostDataFromRequest(int req) {
+    public void useAllData() throws IOException {
+        Har har = proxy.getHar();
+        filterHar(har);
+        StringWriter jsonStr = new StringWriter();
+        har.writeTo(jsonStr);
+        load(jsonStr.toString());
+    }
+
+    public void usePostDataFromRequest(int req) {
         Har har = proxy.getHar();
         filterHar(har);
         load(har.getLog().getEntries().get(req).getRequest().getPostData().getText());
-        return true;
     }
 
-    public boolean useQueryStringFromRequest(int req) {
+    public void useQueryStringFromRequest(int req) {
         Har har = proxy.getHar();
         filterHar(har);
         JSONObject queryString = new JSONObject();
@@ -68,7 +102,6 @@ public class XhrTest extends JsonFixture {
             queryString.put(pair.getName(), pair.getValue());
         }
         load(queryString.toString());
-        return true;
     }
 
     public Object valueOfJsonPath(String path) {
@@ -105,6 +138,7 @@ public class XhrTest extends JsonFixture {
     }
 
     public void stopProxy() {
+        proxy.endHar();
         proxy.stop();
         proxy = new BrowserMobProxyServer();
     }
