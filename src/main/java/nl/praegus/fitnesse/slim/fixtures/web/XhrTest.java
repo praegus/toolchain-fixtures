@@ -15,18 +15,22 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 public class XhrTest extends JsonFixture {
-    private static final BrowserMobProxy proxy = new BrowserMobProxyServer();
+    private static BrowserMobProxy proxy = new BrowserMobProxyServer();
     private static final ByteArrayOutputStream harOutput = new ByteArrayOutputStream();
     private static String endpoint;
 
     public XhrTest(String domain, String endpoint) {
-        this.endpoint = endpoint; //We should find a better solution for this
-        proxy.start(0);
-        proxy.enableHarCaptureTypes(CaptureType.REQUEST_CONTENT);
-        proxy.newHar(domain);
+        startProxyOnFor(domain, endpoint);
     }
 
     public XhrTest() {
+    }
+
+    public void startProxyOnFor(String domain, String endpoint) {
+        this.endpoint = endpoint; //We should find a better solution for this
+        proxy.start(0);
+        proxy.enableHarCaptureTypes(CaptureType.REQUEST_CONTENT);
+        proxy.newHar(cleanupValue(domain));
     }
 
     public int getProxyPort() {
@@ -108,5 +112,6 @@ public class XhrTest extends JsonFixture {
             throw new SlimFixtureException(false, "Failed to flush har output");
         }
         proxy.stop();
+        proxy = new BrowserMobProxyServer();
     }
 }
