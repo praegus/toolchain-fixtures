@@ -1,0 +1,35 @@
+stages:
+  - build
+  - sonar
+
+variables:
+  MAVEN_OPTS: "-Dhttps.protocols=TLSv1.2 -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
+  MAVEN_CLI_OPTS: "--batch-mode"
+
+cache:
+  key: one-key-to-rule-them-all
+  paths:
+    - .m2/repository
+
+build:
+  stage: build
+  script: mvn $MAVEN_CLI_OPTS test
+  image: "maven:3.6.0-jdk-8-alpine"
+  tags:
+    - mvn
+  artifacts:
+    name: "toolchain-fixtures"
+    expire_in: 1 hour
+    paths:
+      - target/*
+  except:
+    - master
+
+sonar:
+  stage: sonar
+  script: mvn sonar:sonar -Dsonar.projectKey=toolchain-fixtures -Dsonar.host.url=$SONAR_ENDPOINT -Dsonar.login=$SONAR_LOGIN
+  image: "maven:3.6.0-jdk-8-alpine"
+  tags:
+    - mvn
+  except:
+    - master
