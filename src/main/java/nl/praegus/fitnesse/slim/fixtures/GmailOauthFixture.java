@@ -71,6 +71,10 @@ public class GmailOauthFixture extends SlimFixture {
         bodyMimeType = "text/" + format;
     }
 
+    private void setLatestMessageBody(String base64EncodedMessageBody) {
+        latestMessageBody = StringUtils.newStringUtf8(Base64.decodeBase64(base64EncodedMessageBody));
+    }
+
     public String latestMessageBody() {
         if (bodyMimeType.equalsIgnoreCase("text/html")) {
             return "<pre>" + StringEscapeUtils.escapeHtml4(latestMessageBody) + "</pre>";
@@ -152,12 +156,16 @@ public class GmailOauthFixture extends SlimFixture {
             StringBuilder sb = new StringBuilder();
             List<String> attachments = new ArrayList<>();
             Message message = service.users().messages().get(user, latestMessageId).setFormat("full").execute();
-            for (MessagePart part : message.getPayload().getParts()) {
-                processPart(part, sb, attachments);
-            }
-            latestMessageBody = StringUtils.newStringUtf8(Base64.decodeBase64(sb.toString()));
-            latestMessageAttachments = attachments;
 
+            if (message.getPayload().getParts() != null) {
+                for (MessagePart part : message.getPayload().getParts()) {
+                    processPart(part, sb, attachments);
+                }
+                setLatestMessageBody(sb.toString());
+            } else {
+                setLatestMessageBody(message.getPayload().getBody().getData());
+                latestMessageAttachments = attachments;
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
