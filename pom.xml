@@ -9,37 +9,23 @@
     <description>Extensions on existing fixtures to aid in automated testing</description>
     <version>1.8-SNAPSHOT</version>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-annotations</artifactId>
-                <version>2.9.5</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.guava</groupId>
-                <artifactId>guava</artifactId>
-                <version>27.0-jre</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
     <dependencies>
         <dependency>
-            <groupId>com.github.tcnh</groupId>
+            <groupId>org.fitnesse</groupId>
             <artifactId>fitnesse</artifactId>
-            <version>20181025</version>
+            <version>20190428</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>nl.hsac</groupId>
             <artifactId>hsac-fitnesse-fixtures</artifactId>
-            <version>3.31.2</version>
+            <version>4.4.1</version>
         </dependency>
         <!-- SSH -->
         <dependency>
             <groupId>com.jcraft</groupId>
             <artifactId>jsch</artifactId>
-            <version>0.1.54</version>
+            <version>0.1.55</version>
         </dependency>
         <!-- XHR -->
         <dependency>
@@ -56,17 +42,17 @@
         <dependency>
             <groupId>com.google.api-client</groupId>
             <artifactId>google-api-client</artifactId>
-            <version>1.26.0</version>
+            <version>1.28.0</version>
         </dependency>
         <dependency>
             <groupId>com.google.oauth-client</groupId>
             <artifactId>google-oauth-client-jetty</artifactId>
-            <version>1.26.0</version>
+            <version>1.28.0</version>
         </dependency>
         <dependency>
             <groupId>com.google.apis</groupId>
             <artifactId>google-api-services-gmail</artifactId>
-            <version>v1-rev82-1.23.0</version>
+            <version>v1-rev20190422-1.28.0</version>
         </dependency>
 
     </dependencies>

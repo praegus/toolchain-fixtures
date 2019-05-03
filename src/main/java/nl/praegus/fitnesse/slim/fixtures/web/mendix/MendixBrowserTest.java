@@ -6,8 +6,6 @@ import nl.hsac.fitnesse.fixture.slim.web.annotation.WaitUntil;
 import nl.hsac.fitnesse.fixture.util.selenium.SeleniumHelper;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 /**
  * Fixture class customized to test mendix web apps.
@@ -199,24 +197,20 @@ public class MendixBrowserTest extends BrowserTest<WebElement> {
     private void waitForJqueryIfNeeded() {
         if(waitForJquery) {
             try{
-                waitForJQuery(getSeleniumHelper().driver());
+                int originalTimeout = secondsBeforeTimeout();
+                secondsBeforeTimeout(jqueryTimeout);
+                ExpectedCondition<Object> condition = webDriver -> jQueryIsDone();
+
+                waitUntil(condition);
+
+                secondsBeforeTimeout(originalTimeout);
             } catch (WebDriverException e) {
                 System.err.println("Exception when checking jquery status. Continue.");
             }
         }
     }
 
-    void clickWhenVisible(WebDriver driver) {
-        WebDriverWait wait = new WebDriverWait(driver, 10);
-        ExpectedCondition<WebElement> condition = ExpectedConditions.visibilityOfElementLocated(By.linkText("link text"));
-
-        wait.until(condition).click();
-    }
-
-    private void waitForJQuery(WebDriver driver) {
-        (new WebDriverWait(driver, jqueryTimeout)).until((ExpectedCondition<Boolean>) d -> {
-            JavascriptExecutor js = (JavascriptExecutor) d;
-            return (Boolean) executeScript("return window.jQuery.active == 0");
-        });
+    private boolean jQueryIsDone() {
+        return (Boolean) executeScript("return window.jQuery.active == 0");
     }
 }

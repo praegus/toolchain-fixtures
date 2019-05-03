@@ -142,7 +142,7 @@ public class SftpFixture extends FileFixture {
             InputStream stream = sftpChannel.get(remoteFile);
             ByteSource streamBytes = new ByteSource() {
                 @Override
-                public InputStream openStream() throws IOException {
+                public InputStream openStream() {
                     return stream;
                 }
             };

@@ -100,8 +100,8 @@ public class CsvFileFixture extends FileFixture {
             int columnIndex = indexOfColumn(columns, column);
 
             if (columnIndex >= 0) {
-                for (int i = 0; i < lines.size(); i++) {
-                    String[] values = lines.get(i).split(separator);
+                for (String line : lines) {
+                    String[] values = line.split(separator);
                     if (values[columnIndex].equals(lookupValue)) {
                         String[] keys = lines.get(0).split(separator);
                         for (int j = 0; j < keys.length; j++) {
