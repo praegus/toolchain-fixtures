@@ -15,14 +15,22 @@ import java.util.TreeSet;
 import java.util.Vector;
 
 public class SftpFixture extends FileFixture {
-
     private JSch jsch = new JSch();
+    private Session session;
+    private ChannelSftp sftpChannel;
+
     private String username;
     private String password;
     private String host;
     private int port = 22;
-    private Session session;
-    private ChannelSftp sftpChannel;
+
+    protected SftpFixture(JSch jsch, Session session, ChannelSftp sftpChannel){
+        this.jsch = jsch;
+        this.session = session;
+        this.sftpChannel = sftpChannel;
+    }
+
+    public SftpFixture(){}
 
     public void setUsername(String username) {
         this.username = username;
