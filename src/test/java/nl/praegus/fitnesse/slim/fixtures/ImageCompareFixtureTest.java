@@ -16,9 +16,8 @@ public class ImageCompareFixtureTest {
         String result = imageCompareFixture.differencesBetweenAnd("src/test/resources/praegus-p.png", "src/test/resources/praegus-p.png");
         assertThat(result).contains("<div><a href=\"files/comparison-map-");
         assertThat(result).contains("target=\"_blank\"><img src=\"files/comparison-map-");
-        assertThat(result).contains("toolchain-fixtures/FitNesseRoot/files/comparison-map-".replace("/", File.separator));
+        assertThat(result).contains("/FitNesseRoot/files/comparison-map-".replace("/", File.separator));
         assertThat(result).contains("height=\"400\"/></a></div>");
-
 
     }
 
