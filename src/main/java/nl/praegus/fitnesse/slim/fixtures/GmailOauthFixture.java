@@ -13,6 +13,7 @@ import com.google.api.client.util.Base64;
 import com.google.api.client.util.StringUtils;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.gmail.Gmail;
+import com.google.api.services.gmail.Gmail.Users.Messages;
 import com.google.api.services.gmail.GmailScopes;
 import com.google.api.services.gmail.model.*;
 import nl.hsac.fitnesse.fixture.slim.SlimFixture;
@@ -38,7 +39,6 @@ public class GmailOauthFixture extends SlimFixture {
     private String filterQuery = "";
     private Gmail service;
     private String user = "me"; //Default to special user "me" - pointing to the logged in user
-
     private String latestMessageBody = "";
     private List<String> latestMessageAttachments = new ArrayList<>();
     private String latestMessageId;
@@ -111,7 +111,7 @@ public class GmailOauthFixture extends SlimFixture {
 
     public boolean trashCurrentMessage() {
         try {
-            service.users().messages().trash(user, latestMessageId).execute();
+            getAllMessages().trash(user, latestMessageId).execute();
             return true;
         } catch (IOException e) {
             System.err.println(e.getMessage());
@@ -121,11 +121,26 @@ public class GmailOauthFixture extends SlimFixture {
 
     public boolean deleteCurrentMessage() {
         try {
-            service.users().messages().delete(user, latestMessageId).execute();
+            getAllMessages().delete(user, latestMessageId).execute();
             return true;
         } catch (IOException e) {
             System.err.println(e.getMessage());
             return false;
+        }
+    }
+
+    /**
+     * Deletes all messages matching a given query.  E.g. query "in:inbox" empties inbox. If no messages are found
+     * no delete is executed.
+     *
+     * @param query gmail query as described on https://support.google.com/mail/answer/7190?hl=en
+     * @throws IOException
+     */
+    public void deleteAllMessagesMatchingQuery(String query) throws IOException {
+        List<Message> messages = filteredInbox();
+        setFilterQuery(query);
+        if (messages != null) {
+            batchDeleteMessages(getMessageIds(messages));
         }
     }
 
@@ -155,7 +170,7 @@ public class GmailOauthFixture extends SlimFixture {
         try {
             StringBuilder sb = new StringBuilder();
             List<String> attachments = new ArrayList<>();
-            Message message = service.users().messages().get(user, latestMessageId).setFormat("full").execute();
+            Message message = getAllMessages().get(user, latestMessageId).setFormat("full").execute();
 
             if (message.getPayload().getParts() != null) {
                 for (MessagePart part : message.getPayload().getParts()) {
@@ -203,7 +218,7 @@ public class GmailOauthFixture extends SlimFixture {
 
     private List<Message> filteredInbox() {
         try {
-            ListMessagesResponse msgResponse = service.users().messages().list(user).setQ(filterQuery).execute();
+            ListMessagesResponse msgResponse = getAllMessages().list(user).setQ(filterQuery).execute();
             List<Message> messages = msgResponse.getMessages();
             if (null != messages && messages.size() > 0) {
                 latestMessageId = messages.get(0).getId();
@@ -216,4 +231,17 @@ public class GmailOauthFixture extends SlimFixture {
         }
     }
 
+    private void batchDeleteMessages(List<String> messageIds) throws IOException {
+        getAllMessages().batchDelete(user, new BatchDeleteMessagesRequest().setIds(messageIds)).execute();
+    }
+
+    private Messages getAllMessages() {
+        return service.users().messages();
+    }
+
+    private List<String> getMessageIds(List<Message> messages) {
+        List<String> filteredInboxMessageIds = new ArrayList<>();
+        messages.forEach(message -> filteredInboxMessageIds.add(message.getId()));
+        return filteredInboxMessageIds;
+    }
 }
