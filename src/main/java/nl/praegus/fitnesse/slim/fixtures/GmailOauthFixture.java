@@ -13,6 +13,7 @@ import com.google.api.client.util.Base64;
 import com.google.api.client.util.StringUtils;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.gmail.Gmail;
+import com.google.api.services.gmail.Gmail.Users.Messages;
 import com.google.api.services.gmail.GmailScopes;
 import com.google.api.services.gmail.model.*;
 import nl.hsac.fitnesse.fixture.slim.SlimFixture;
@@ -143,10 +144,6 @@ public class GmailOauthFixture extends SlimFixture {
         }
     }
 
-    public boolean pollUntilMessageArrives() {
-        return repeatUntil(inboxRetrievedCompletion());
-    }
-
     private void processPart(MessagePart part, StringBuilder sb, List<String> attachments) {
         if (part.getParts() != null) {
             for (MessagePart prt : part.getParts()) {
@@ -159,6 +156,10 @@ public class GmailOauthFixture extends SlimFixture {
                 attachments.add(part.getFilename());
             }
         }
+    }
+
+    public boolean pollUntilMessageArrives() {
+        return repeatUntil(inboxRetrievedCompletion());
     }
 
     protected FunctionalCompletion inboxRetrievedCompletion() {
@@ -234,7 +235,7 @@ public class GmailOauthFixture extends SlimFixture {
         getAllMessages().batchDelete(user, new BatchDeleteMessagesRequest().setIds(messageIds)).execute();
     }
 
-    private Gmail.Users.Messages getAllMessages() {
+    private Messages getAllMessages() {
         return service.users().messages();
     }
 
