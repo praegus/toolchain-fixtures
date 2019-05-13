@@ -80,6 +80,9 @@ public class MendixBrowserTest extends BrowserTest<WebElement> {
     private SeleniumHelper seleniumHelper = getEnvironment().getSeleniumHelper();
     private int delayBeforeValue = 0;
     private int inputDelay = 0;
+    private String progressIndicator = "css=.mx-progress-indicator";
+    private String xpathForHeadTable = "//table[contains(@class, 'mx-datagrid-head-table')]";
+    private String xpathForBodyTable = "//table[contains(@class, 'mx-datagrid-body-table')]";
 
 
     /**
@@ -88,10 +91,11 @@ public class MendixBrowserTest extends BrowserTest<WebElement> {
     @Override
     protected void beforeInvoke(Method method, Object[] arguments) {
         super.beforeInvoke(method, arguments);
+
         waitForJqueryIfNeeded();
         if (!METHODS_NO_WAIT.contains(method.getName())) {
             try {
-                waitUntil(webDriver -> isNotVisibleOnPage("css=.mx-progress-indicator"));
+                waitUntil(webDriver -> isNotVisibleOnPage(progressIndicator));
             } catch (SlimFixtureException e) {
                 String msg = e.getMessage();
                 if (msg.startsWith("message:<<") && msg.endsWith(">>")) {
@@ -117,6 +121,10 @@ public class MendixBrowserTest extends BrowserTest<WebElement> {
 
     public int getInputDelay() {
         return inputDelay;
+    }
+
+    public void identifyProgressIndicatorUsing(String place) {
+        this.progressIndicator = place;
     }
 
     @Override
@@ -176,8 +184,8 @@ public class MendixBrowserTest extends BrowserTest<WebElement> {
     @WaitUntil(TimeoutPolicy.RETURN_NULL)
     public String valueOfInRowWhereIsInTable(String requestedColumnName, String selectOnColumn, String selectOnValue, String table) {
         //Search in the right table
-        String xpathForHeadTable = xpathForTable(table, "head");
-        String xpathForBodyTable = xpathForTable(table, "body");
+        String xpathForHeadTable = xpathForTableByName(table, "head");
+        String xpathForBodyTable = xpathForTableByName(table, "body");
 
         int selectColumnIndex = columnIndex(xpathForHeadTable, selectOnColumn);
         int requestedColumnIndex = columnIndex(xpathForHeadTable, requestedColumnName);
@@ -208,8 +216,6 @@ public class MendixBrowserTest extends BrowserTest<WebElement> {
     @Override
     @WaitUntil(TimeoutPolicy.RETURN_NULL)
     public String valueOfInRowNumber(String requestedColumnName, int rowNumber) {
-        String xpathForHeadTable = "//table[contains(@class, 'mx-datagrid-head-table')]";
-        String xpathForBodyTable = "//table[contains(@class, 'mx-datagrid-body-table')]";
 
         int columnIndex = columnIndex(xpathForHeadTable, requestedColumnName);
 
@@ -233,9 +239,6 @@ public class MendixBrowserTest extends BrowserTest<WebElement> {
     }
 
     private WebElement elementInRowWhereIs(String requestedColumnName, String selectOnColumn, String selectOnValue) {
-        //Search in the right table
-        String xpathForHeadTable = "//table[contains(@class, 'mx-datagrid-head-table')]";
-        String xpathForBodyTable = "//table[contains(@class, 'mx-datagrid-body-table')]";
 
         int selectColumnIndex = columnIndex(xpathForHeadTable, selectOnColumn);
         int requestedColumnIndex = columnIndex(xpathForHeadTable, requestedColumnName);
@@ -245,7 +248,7 @@ public class MendixBrowserTest extends BrowserTest<WebElement> {
         return seleniumHelper.findByXPath(xpath);
     }
 
-    private String xpathForTable(String table, String type) {
+    private String xpathForTableByName(String table, String type) {
         int i = 1;
         String xpath = "";
         boolean displayed = false;
@@ -309,7 +312,6 @@ public class MendixBrowserTest extends BrowserTest<WebElement> {
     }
 
     private boolean jQueryIsDone() {
-        boolean result = (Boolean) executeScript("return window.jQuery.active === 0");
-        return result;
+        return (Boolean) executeScript("return window.jQuery.active === 0");
     }
 }
