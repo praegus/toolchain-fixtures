@@ -206,6 +206,28 @@ public class MendixBrowserTest extends BrowserTest<WebElement> {
     }
 
     @Override
+    @WaitUntil(TimeoutPolicy.RETURN_NULL)
+    public String valueOfInRowNumber(String requestedColumnName, int rowNumber) {
+        String xpathForHeadTable = "//table[contains(@class, 'mx-datagrid-head-table')]";
+        String xpathForBodyTable = "//table[contains(@class, 'mx-datagrid-body-table')]";
+
+        int columnIndex = columnIndex(xpathForHeadTable, requestedColumnName);
+
+        String xpath = String.format("%s//tr[%d]/td[%d]", xpathForBodyTable, rowNumber, columnIndex);
+
+        WebElement element = seleniumHelper.findByXPath(xpath);
+        if(element != null) {
+            String result = valueFor(element);
+            if (result.length() == 0) {
+                result = element.getAttribute("title");
+            }
+            return result;
+        }
+        return null;
+
+    }
+
+    @Override
     public boolean clickInRowWhereIs(String requestedColumnName, String selectOnColumn, String selectOnValue) {
         return clickElement(elementInRowWhereIs(requestedColumnName, selectOnColumn, selectOnValue));
     }
