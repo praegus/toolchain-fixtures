@@ -4,7 +4,6 @@ import nl.hsac.fitnesse.fixture.slim.SlimFixtureException;
 import nl.hsac.fitnesse.fixture.slim.web.BrowserTest;
 import nl.hsac.fitnesse.fixture.slim.web.annotation.TimeoutPolicy;
 import nl.hsac.fitnesse.fixture.slim.web.annotation.WaitUntil;
-import nl.hsac.fitnesse.fixture.util.selenium.SeleniumHelper;
 import nl.hsac.fitnesse.slim.interaction.ReflectionHelper;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -77,7 +76,7 @@ public class MendixBrowserTest extends BrowserTest<WebElement> {
 
     private boolean waitForJquery = false;
     private int jqueryTimeout = 5; //Timeout in seconds
-    private SeleniumHelper seleniumHelper = getEnvironment().getSeleniumHelper();
+
     private int delayBeforeValue = 0;
     private int inputDelay = 0;
     private String progressIndicator = "css=.mx-progress-indicator";
@@ -91,10 +90,10 @@ public class MendixBrowserTest extends BrowserTest<WebElement> {
     @Override
     protected void beforeInvoke(Method method, Object[] arguments) {
         super.beforeInvoke(method, arguments);
-
-        waitForJqueryIfNeeded();
         if (!METHODS_NO_WAIT.contains(method.getName())) {
             try {
+                waitForJqueryIfNeeded();
+                waitMilliseconds(inputDelay);
                 waitUntil(webDriver -> isNotVisibleOnPage(progressIndicator));
             } catch (SlimFixtureException e) {
                 String msg = e.getMessage();
@@ -147,7 +146,7 @@ public class MendixBrowserTest extends BrowserTest<WebElement> {
         if (xPath.startsWith("xpath=")) {
             xPath = xPath.substring(6);
         }
-        return getSeleniumHelper().driver().findElements(By.xpath(xPath)).size();
+        return getSeleniumHelper().findElements(By.xpath(xPath)).size();
     }
 
     @Override
@@ -174,29 +173,11 @@ public class MendixBrowserTest extends BrowserTest<WebElement> {
     }
 
     public String getCsrfToken() {
-        return seleniumHelper.executeJavascript("return window.mx.session.sessionData.csrftoken").toString();
+        return getSeleniumHelper().executeJavascript("return window.mx.session.sessionData.csrftoken").toString();
     }
 
     public void delayValueExtractionByMilliseconds(int millis) {
         delayBeforeValue = millis;
-    }
-
-    @WaitUntil(TimeoutPolicy.RETURN_NULL)
-    public String valueOfInRowWhereIsInTable(String requestedColumnName, String selectOnColumn, String selectOnValue, String table) {
-        //Search in the right table
-        String xpathForHeadTable = xpathForTableByName(table, "head");
-        String xpathForBodyTable = xpathForTableByName(table, "body");
-
-        int selectColumnIndex = columnIndex(xpathForHeadTable, selectOnColumn);
-        int requestedColumnIndex = columnIndex(xpathForHeadTable, requestedColumnName);
-
-        String xpath = String.format("%s//td[%s][contains(.,'%s')]/parent::tr/td[%s]", xpathForBodyTable, selectColumnIndex, selectOnValue, requestedColumnIndex);
-        WebElement element = seleniumHelper.findByXPath(xpath);
-        String result = valueFor(element);
-        if (result.length() == 0) {
-            result = element.getAttribute("title");
-        }
-        return result;
     }
 
     @WaitUntil(TimeoutPolicy.RETURN_NULL)
@@ -221,7 +202,7 @@ public class MendixBrowserTest extends BrowserTest<WebElement> {
 
         String xpath = String.format("%s//tr[%d]/td[%d]", xpathForBodyTable, rowNumber, columnIndex);
 
-        WebElement element = seleniumHelper.findByXPath(xpath);
+        WebElement element = getSeleniumHelper().findByXPath(xpath);
         if(element != null) {
             String result = valueFor(element);
             if (result.length() == 0) {
@@ -234,6 +215,7 @@ public class MendixBrowserTest extends BrowserTest<WebElement> {
     }
 
     @Override
+    @WaitUntil(TimeoutPolicy.RETURN_FALSE)
     public boolean clickInRowWhereIs(String requestedColumnName, String selectOnColumn, String selectOnValue) {
         return clickElement(elementInRowWhereIs(requestedColumnName, selectOnColumn, selectOnValue));
     }
@@ -243,32 +225,15 @@ public class MendixBrowserTest extends BrowserTest<WebElement> {
         int selectColumnIndex = columnIndex(xpathForHeadTable, selectOnColumn);
         int requestedColumnIndex = columnIndex(xpathForHeadTable, requestedColumnName);
 
-        String xpath = String.format("%s//td[%s][contains(.,'%s')]/parent::tr/td[%s]", xpathForBodyTable, selectColumnIndex, selectOnValue, requestedColumnIndex);
+        String xpath = String.format("%s//td[%s][normalize-space(descendant-or-self::text())='%s']/parent::tr/td[%s]", xpathForBodyTable, selectColumnIndex, selectOnValue, requestedColumnIndex);
 
-        return seleniumHelper.findByXPath(xpath);
+        return getSeleniumHelper().findByXPath(xpath);
     }
 
-    private String xpathForTableByName(String table, String type) {
-        int i = 1;
-        String xpath = "";
-        boolean displayed = false;
-        WebElement el;
-        while (!displayed) {
-            xpath = String.format("(//*[text()='%s']/ancestor::div[@class='row']//table[contains(@class, '%s-table')])[%s]", table, type, String.valueOf(i));
-            el = seleniumHelper.findByXPath(xpath);
-            if (el == null) {
-                xpath = String.format("//*[text()='%s']/ancestor::div[@class='row']//table[contains(@class, '%s-table')]", table, type);
-                break;
-            } else {
-                displayed = el.isDisplayed();
-                i++;
-            }
-        }
-        return xpath;
-    }
+
 
     private int columnIndex(String tableXpath, String columnName) {
-        int precedingColumns = findElements(By.xpath(String.format("%s//th[contains(.,'%s')]/preceding-sibling::th", tableXpath, columnName))).size();
+        int precedingColumns = getSeleniumHelper().findElements(By.xpath(String.format("%s//th[normalize-space(descendant-or-self::text())='%s']/preceding-sibling::th", tableXpath, columnName))).size();
         return precedingColumns + 1;
     }
 
@@ -279,31 +244,14 @@ public class MendixBrowserTest extends BrowserTest<WebElement> {
         return super.valueOf(place);
     }
 
-    @Override
-    protected boolean enter(String value, String place, String container, boolean shouldClear) {
-        WebElement element = getElementToSendValue(place, container);
-        boolean result = element != null && isInteractable(element);
-
-        if (result) {
-            if (shouldClear) {
-                element.clear();
-            }
-            waitMilliseconds(inputDelay);
-            sendValue(element, value);
-        }
-        return result;
-    }
-
 
     private void waitForJqueryIfNeeded() {
         if(waitForJquery) {
             try{
                 int originalTimeout = secondsBeforeTimeout();
                 secondsBeforeTimeout(jqueryTimeout);
-                ExpectedCondition<Object> condition = webDriver -> jQueryIsDone();
-
+                ExpectedCondition<Boolean> condition = jQueryToBeReady();
                 waitUntil(condition);
-
                 secondsBeforeTimeout(originalTimeout);
             } catch (WebDriverException e) {
                 // ignore. Probably no jQ.
@@ -311,7 +259,7 @@ public class MendixBrowserTest extends BrowserTest<WebElement> {
         }
     }
 
-    private boolean jQueryIsDone() {
-        return (Boolean) executeScript("return window.jQuery.active === 0");
+    private ExpectedCondition<Boolean> jQueryToBeReady() {
+        return driver -> (Boolean) executeScript("return window.jQuery.active == 0");
     }
 }
