@@ -154,7 +154,7 @@
                 <configuration>
                     <serverId>staging</serverId>
                     <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                    <autoReleaseAfterClose>false</autoReleaseAfterClose>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
                 <goals>
                     <goal>deploy</goal>
