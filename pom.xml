@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>nl.praegus</groupId>
@@ -8,7 +7,7 @@
     <url>https://gitlab.com/praegus/toolchain-fixtures/toolchain-fixtures</url>
     <name>Praegus Toolchain extended fixture pack</name>
     <description>Extensions on existing fixtures to aid in automated testing</description>
-    <version>1.14-SNAPSHOT</version>
+    <version>1.14</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -212,7 +211,7 @@
                     <excludePackageNames>nl.hsac.*</excludePackageNames>
                     <includeDependencySources>true</includeDependencySources>
                     <dependencySourceIncludes>
-                        <dependencySourceInclude>nl.hsac:*</dependencySourceInclude>-->
+                        <dependencySourceInclude>nl.hsac:*</dependencySourceInclude>--&gt;
                     </dependencySourceIncludes>
                     <!-- AutoCompleteResponder expects the documentation in wiki/fixtures -->
                     <reportOutputDirectory>${project.basedir}/src/main/resources/META-INF/</reportOutputDirectory>
@@ -250,7 +249,7 @@
         <url>https://gitlab.com/praegus/toolchain-fixtures/toolchain-fixtures.git</url>
         <developerConnection>scm:git:git@gitlab.com:praegus/toolchain-fixtures/toolchain-fixtures.git
         </developerConnection>
-        <tag>HEAD</tag>
+        <tag>toolchain-fixtures-1.14</tag>
     </scm>
 
     <profiles>
