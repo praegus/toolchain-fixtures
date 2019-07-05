@@ -24,15 +24,47 @@ public class PdfCompare extends FileFixture {
 
     /**
      * Compare two pdf files. Set up using links to an expected pdf and the actual pdf
+     * Use compare to execute the actual compare.
      *
      * @param expected Filename of the expected pdf file (can be a wiki file url or abslute path)
      * @param actual   Filename of the actual pdf file (can be a wiki file url or abslute path)
      */
     public PdfCompare(String expected, String actual) {
-        String resultDir = new File(filesDir, "PdfCompare").getPath() + File.separator;
-        setDirectory(resultDir);
+        setResultDirTo(new File(filesDir, "PdfCompare").getPath() + File.separator);
         this.expected = getFullName(expected);
         this.actual = getFullName(actual);
+    }
+
+    /**
+     * Default constructor. Use compare [expected] to [actual] to execute the compare
+     *
+     * @param expected Filename of the expected pdf file (can be a wiki file url or abslute path)
+     * @param actual   Filename of the actual pdf file (can be a wiki file url or abslute path)
+     */
+    public PdfCompare() {
+        setResultDirTo(new File(filesDir, "PdfCompare").getPath() + File.separator);
+    }
+
+    /**
+     * Sets the result directory. Defaults to the wiki's files directory/PdCompare
+     *
+     * @param resultDir The absolute directory path.
+     */
+    public void setResultDirTo(String resultDir) {
+        setDirectory(resultDir);
+    }
+
+    /**
+     * Compare the expected and actual PDF's using the current settings
+     *
+     * @param expected The expected PDF
+     * @param actual   The actual PDF to compare to the expected PDF
+     * @return true if the pdf's are equal
+     */
+    public boolean compareTo(String expected, String actual) {
+        this.expected = getFullName(expected);
+        this.actual = getFullName(actual);
+        return compare();
     }
 
     /**
@@ -53,6 +85,7 @@ public class PdfCompare extends FileFixture {
 
         return result.isEqual();
     }
+
 
     /**
      * Write the diff to a pdf file
