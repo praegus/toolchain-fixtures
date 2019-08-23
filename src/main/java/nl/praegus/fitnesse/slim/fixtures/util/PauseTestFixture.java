@@ -4,7 +4,6 @@ import nl.hsac.fitnesse.fixture.slim.SlimFixture;
 import nl.hsac.fitnesse.fixture.slim.StopTestException;
 
 import javax.swing.*;
-import java.awt.*;
 import java.net.URL;
 
 import static javax.swing.JOptionPane.showOptionDialog;

@@ -198,7 +198,7 @@ public class GmailOauthFixture extends SlimFixture {
      * no delete is executed.
      *
      * @param query gmail query as described on https://support.google.com/mail/answer/7190?hl=en
-     * @throws IOException
+     * @throws IOException if no messages were found
      */
     public void deleteAllMessagesMatchingQuery(String query) throws IOException {
         List<Message> messages = filteredInbox();
@@ -213,7 +213,7 @@ public class GmailOauthFixture extends SlimFixture {
      *
      * @param emailData A map containing to, from, subject, body, attachment (optional) as strings.
      *                  Attachment can be a wiki or absolute url pointing to a file to attach.
-     * @return
+     * @return true if sending completes successfully
      */
     public boolean sendEmail(Map<String, String> emailData) {
         MimeMessage msg;
@@ -242,16 +242,6 @@ public class GmailOauthFixture extends SlimFixture {
 
     }
 
-    /**
-     * Create a MimeMessage using the parameters provided.
-     *
-     * @param to       email address of the receiver
-     * @param from     email address of the sender, the mailbox account
-     * @param subject  subject of the email
-     * @param bodyText body text of the email
-     * @return the MimeMessage to be used to send email
-     * @throws MessagingException
-     */
     private MimeMessage createMessageWithText(String to, String from, String subject, String bodyText) throws MessagingException {
         Properties props = new Properties();
         Session session = Session.getDefaultInstance(props, null);
@@ -266,17 +256,6 @@ public class GmailOauthFixture extends SlimFixture {
         return email;
     }
 
-    /**
-     * Create a MimeMessage using the parameters provided.
-     *
-     * @param to       Email address of the receiver.
-     * @param from     Email address of the sender, the mailbox account.
-     * @param subject  Subject of the email.
-     * @param bodyText Body text of the email.
-     * @param file     Path to the file to be attached.
-     * @return MimeMessage to be used to send email.
-     * @throws MessagingException
-     */
     private MimeMessage createMessageWithAttachment(String to, String from, String subject, String bodyText, File file) throws MessagingException {
         Properties props = new Properties();
         Session session = Session.getDefaultInstance(props, null);
@@ -306,14 +285,6 @@ public class GmailOauthFixture extends SlimFixture {
         return email;
     }
 
-    /**
-     * Create a message from an email.
-     *
-     * @param emailContent Email to be set to raw of message
-     * @return a message containing a base64url encoded email
-     * @throws IOException
-     * @throws MessagingException
-     */
     private Message createMessageWithEmail(MimeMessage emailContent)
             throws javax.mail.MessagingException, IOException {
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
