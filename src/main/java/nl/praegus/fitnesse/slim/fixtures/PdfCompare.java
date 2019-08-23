@@ -118,6 +118,7 @@ public class PdfCompare extends FileFixture {
 
     /**
      * Exclude an area (in px, at 300ppi) on any page (useful for page numbers, etc)
+     * Usage: | exclude area | [area] | on any page |
      *
      * @param area A comma-separated string: xStart, yStart, xEnd, yEnd
      */

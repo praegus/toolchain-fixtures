@@ -15,11 +15,21 @@ public class PauseTestFixture extends SlimFixture {
     private final Object lock = new Object();
     private String msg = "Test execution is paused...";
 
-
+    /**
+     * Pause the test and prompt the user if they wish to continue
+     * @return true if continue is selected, otherwise return false.
+     * @throws StopTestException, effectively aborting the test and continue with teardowns
+     */
     public boolean pause() throws StopTestException {
         return pause(msg);
     }
 
+    /**
+     * Pause the test with a custom message and prompt the user if they wish to continue
+     * @param message The message to be displayed
+     * @return true if continue is selected, otherwise return false.
+     * @throws StopTestException, effectively aborting the test and continue with teardowns
+     */
     public boolean pause(String message) throws StopTestException {
         if(!canPause()) {
             throw new StopTestException(false, "Pause was called from a Junit run. Aborting to avoid infinite waiting..");

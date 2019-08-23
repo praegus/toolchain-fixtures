@@ -53,6 +53,11 @@ public class GmailOauthFixture extends SlimFixture {
     private static final Pattern URL_PATTERN =
             Pattern.compile("https?://(www\\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_+.~#?&/=!]*)");
 
+    /**
+     * Create a gmail connection for the given App
+     *
+     * @param appName The name of the application, as configured in the GmailAPI at Google
+     */
     public GmailOauthFixture(String appName) {
         try {
             HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
@@ -65,14 +70,29 @@ public class GmailOauthFixture extends SlimFixture {
         }
     }
 
+    /**
+     * Set a postfix for the client secret file. Useful when multiple GMail adresses are used in one project.
+     *
+     * @param clientSecretPostfix The postfix to use.
+     */
     public void setClientSecretPostfix(String clientSecretPostfix) {
         this.clientSecretPostfix = clientSecretPostfix;
     }
 
+    /**
+     * Set the filter query to filter the inbox.
+     *
+     * @param filterQuery The query to use. Documented at: https://support.google.com/mail/answer/7190
+     */
     public void setFilterQuery(String filterQuery) {
         this.filterQuery = filterQuery;
     }
 
+    /**
+     * Specify the message format of the message you expect.
+     *
+     * @param format The format: either plain (default) or html.
+     */
     public void setMessageFormat(String format) { //Can be plain or html
         bodyMimeType = "text/" + format;
     }
@@ -81,6 +101,11 @@ public class GmailOauthFixture extends SlimFixture {
         latestMessageBody = StringUtils.newStringUtf8(Base64.decodeBase64(base64EncodedMessageBody));
     }
 
+    /**
+     * Get the body of the latest email message matching the specified search query. (Or newest in the inbox if no search query is specified)
+     *
+     * @return The body text (either plain text or HTML) as a String.
+     */
     public String latestMessageBody() {
         if (bodyMimeType.equalsIgnoreCase("text/html")) {
             return "<pre>" + StringEscapeUtils.escapeHtml4(latestMessageBody) + "</pre>";
@@ -88,6 +113,12 @@ public class GmailOauthFixture extends SlimFixture {
         return latestMessageBody;
     }
 
+    /**
+     * Save the body of the latest email message matching the specified search query. (Or newest in the inbox if no search query is specified) to a file
+     *
+     * @param fileName The filename to save the body to.
+     * @return a link to the created file
+     */
     public String saveLatestEmailBody(String fileName) {
         String fullName = String.format("%s/emails/%s.html", this.filesDir, fileName);
         File f = new File(fullName);
@@ -97,14 +128,31 @@ public class GmailOauthFixture extends SlimFixture {
         return String.format("<a href=\"%s\" target=\"_blank\">%s</a>", this.getEnvironment().getWikiUrl(f.getAbsolutePath()), f.getName());
     }
 
+    /**
+     * Boolean value that shows if the latest (filtered) message contains the specified needle (String)
+     *
+     * @param needle The text to find
+     * @return true if needle was found, false otherwise
+     */
     public boolean latestMessageBodyContains(String needle) {
         return latestMessageBody.contains(needle);
     }
 
+    /**
+     * Get the attachment names from the latest (filtered) message
+     *
+     * @return a list of filenames attached to the message
+     */
     public List<String> latestMessageAttachments() {
         return latestMessageAttachments;
     }
 
+    /**
+     * Get a link from the latest (filtered) message that contains the specified needle (String)
+     *
+     * @param needle The text to search for
+     * @return the url if a matching url was found, otherwise return an empty String
+     */
     public String getLinkContaining(String needle) {
         Matcher urlMatcher = URL_PATTERN.matcher(latestMessageBody);
         while (urlMatcher.find()) {
@@ -112,9 +160,14 @@ public class GmailOauthFixture extends SlimFixture {
                 return urlMatcher.group(0);
             }
         }
-        return "No match in message URL's";
+        return "";
     }
 
+    /**
+     * Move the latest (filterd) message to the trash folder
+     *
+     * @return true if the message was moved. False if no message was found.
+     */
     public boolean trashCurrentMessage() {
         try {
             getAllMessages().trash(user, latestMessageId).execute();
@@ -125,6 +178,11 @@ public class GmailOauthFixture extends SlimFixture {
         }
     }
 
+    /**
+     * Permanently delete the latest (filtered) message
+     *
+     * @return true if the message was deleted. False if no message was found.
+     */
     public boolean deleteCurrentMessage() {
         try {
             getAllMessages().delete(user, latestMessageId).execute();
@@ -174,7 +232,7 @@ public class GmailOauthFixture extends SlimFixture {
             }
 
             Message message = createMessageWithEmail(msg);
-            message =service.users().messages().send(user, message).execute();
+            message = service.users().messages().send(user, message).execute();
             System.out.println("Sent message with id: " + message.getId());
             return true;
         } catch (javax.mail.MessagingException | IOException e) {
@@ -281,6 +339,11 @@ public class GmailOauthFixture extends SlimFixture {
         }
     }
 
+    /**
+     * Poll the inbox until a message (matching the filter if specified) arrives.
+     *
+     * @return true if a message was found within the maximum number of retries, false otherwise
+     */
     public boolean pollUntilMessageArrives() {
         return repeatUntil(inboxRetrievedCompletion());
     }
