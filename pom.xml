@@ -271,9 +271,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git@gitlab.com:praegus/toolchain-fixtures/toolchain-fixtures.git</connection>
-        <url>https://gitlab.com/praegus/toolchain-fixtures/toolchain-fixtures.git</url>
-        <developerConnection>scm:git:git@gitlab.com:praegus/toolchain-fixtures/toolchain-fixtures.git
+        <connection>scm:git:git@github.com:praegus/toolchain-fixtures.git</connection>
+        <url>https://github.com/praegus/toolchain-fixtures.git</url>
+        <developerConnection>scm:git:git@github.com:praegus/toolchain-fixtures.git
         </developerConnection>
         <tag>HEAD</tag>
     </scm>
