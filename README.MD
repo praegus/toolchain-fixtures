@@ -19,7 +19,7 @@ A fixture to compare images and display difference heatmaps.
 Uses Galen Framework's compare library to allow for accepted differences/tolerance
 
 ### PDF Compare fixture
-A Fixture to compare PDF files and display diffrence maps.
+A Fixture to compare PDF files and display difference maps.
 Uses RedSix's compare library to be able to exclude certain area's from comparison (useful to exclude page numbers, dates, etc) and to be able to define a comparison tolerance.
 
 ### SFTP Fixture
@@ -36,6 +36,10 @@ A fixture to easily interact with the /xas endpoint of Mendix web applications. 
 
 ### Mendix Browser Test
 A set of helper methods for BrowserTest that mae interacting with Mendix Apps easier.
+
+### TOTP fixture
+A fixture the generates Time-based One Time Password, just like Google Authenticator does. 
+Based on [WStranges GoogleAuth code](https://github.com/wstrange/GoogleAuth)
 
 ## Other extra's
 
