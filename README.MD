@@ -41,6 +41,9 @@ A set of helper methods for BrowserTest that mae interacting with Mendix Apps ea
 A fixture the generates Time-based One Time Password, just like Google Authenticator does. 
 Based on [WStranges GoogleAuth code](https://github.com/wstrange/GoogleAuth)
 
+### Excel File Fixture
+A fixture to read/write String data from/to xls files.
+
 ## Other extra's
 
 ### Console log listener
