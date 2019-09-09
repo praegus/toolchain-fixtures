@@ -18,9 +18,30 @@ import nl.hsac.fitnesse.fixture.slim.SlimFixtureException;
  */
 
 public class TotpFixture extends SlimFixture {
-    GoogleAuthenticatorConfig.GoogleAuthenticatorConfigBuilder configBuilder
+    private final GoogleAuthenticatorConfig.GoogleAuthenticatorConfigBuilder configBuilder
             = new GoogleAuthenticatorConfig.GoogleAuthenticatorConfigBuilder();
+    private String secretKey = null;
 
+    /**
+     * Default constructor. Set secret key using setSecretKey or call getTotpForSecret(secretKey) to generate a OTP.
+     */
+    public TotpFixture() {
+    }
+
+    /**
+     * Constructor with secretkey
+     *
+     * @param secretKey secretKey to generate OTP's
+     */
+    public TotpFixture(String secretKey) {
+        setSecretKey(secretKey);
+    }
+
+    /**
+     * Set the number of digits to expect as the returned TOTP. Can be 6, 7 or 8
+     *
+     * @param numberOfDigits The number of digits. Defaults to 6
+     */
     public void setNumberOfDigits(int numberOfDigits) {
         if (numberOfDigits < 6 || numberOfDigits > 8) {
             throw new SlimFixtureException("TOTP length needs to be > 6 and < 8");
@@ -28,7 +49,34 @@ public class TotpFixture extends SlimFixture {
         configBuilder.setCodeDigits(numberOfDigits);
     }
 
-    public String getTOTPForSecret(String secretKey) {
+    /**
+     * Set the secret to generate the code for
+     *
+     * @param secretKey The key to use, as string
+     */
+    public void setSecretKey(String secretKey) {
+        this.secretKey = secretKey;
+    }
+
+    /**
+     * Generate a OTP based on the secret that was set before
+     *
+     * @return OTP as 6-8 digit String
+     */
+    public String getTotp() {
+        return getTotpForSecret(secretKey);
+    }
+
+    /**
+     * Generate a OTP based on a given secret key
+     *
+     * @param secretKey The secret key to generate OTP for
+     * @return OTP as 6-8 digit String
+     */
+    public String getTotpForSecret(String secretKey) {
+        if (null == secretKey) {
+            throw new SlimFixtureException("No secret key was provided to generate OTP with");
+        }
         GoogleAuthenticatorConfig gAuthConfig = configBuilder.build();
         GoogleAuthenticator gAuth = new GoogleAuthenticator(gAuthConfig);
         int totp = gAuth.getTotpPassword(secretKey);
