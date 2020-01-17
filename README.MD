@@ -44,6 +44,10 @@ Based on [WStranges GoogleAuth code](https://github.com/wstrange/GoogleAuth)
 ### Excel File Fixture
 A fixture to read/write String data from/to xls files.
 
+### Calculator
+A fixture that calculates the result of mathematical expression (input as String)
+Returns whole numbers by default, precision can be added to the constructor. 
+
 ## Other extra's
 
 ### Console log listener

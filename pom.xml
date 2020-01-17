@@ -145,6 +145,14 @@
             <version>4.1.0</version>
         </dependency>
 
+        <!-- Calculator -->
+        <dependency>
+            <groupId>org.mariuszgromada.math</groupId>
+            <artifactId>MathParser.org-mXparser</artifactId>
+            <version>4.4.0</version>
+        </dependency>
+
+
         <!-- for unittest -->
         <dependency>
             <groupId>org.assertj</groupId>
@@ -337,7 +345,6 @@
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>
-                                <phase>package</phase>
                                 <goals>
                                     <goal>sign</goal>
                                 </goals>
