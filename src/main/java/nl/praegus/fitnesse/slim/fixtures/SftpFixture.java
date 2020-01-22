@@ -271,6 +271,19 @@ public class SftpFixture extends FileFixture {
     }
 
     /**
+     * Poll until no file matching a given pattern exists in a given directory
+     * Use 'repeatAtMostTimes' and 'setRepeatInterval' to configure the repeat behaviour.
+     * Usage: | poll until no file matching | [filePattern] | exists in | [directory] |
+     *
+     * @param filePattern
+     * @param directory
+     * @return true if no matching file was found. False otherwise
+     */
+    public boolean pollUntilNoFileMatchingExistsIn(String filePattern, String directory) {
+        return repeatUntil(noFileMatchingInDirectoryCompletion(filePattern, directory));
+    }
+
+    /**
      * Poll until at least n files matching a given pattern exist in a given directory
      * Use 'repeatAtMostTimes' and 'setRepeatInterval' to configure the repeat behaviour.
      * Usage: | poll until | [number] | files matching | [filePattern] | exist in | [directory] |
@@ -294,6 +307,14 @@ public class SftpFixture extends FileFixture {
 
     protected boolean atLeastfilesExistInDirectory(int number, String filePattern, String directory) {
         return findPatternInDirectory(filePattern, directory).size() >= number;
+    }
+
+    protected FunctionalCompletion noFileMatchingInDirectoryCompletion(String filePattern, String directory) {
+        return new FunctionalCompletion(() -> noMatchingFilesInDirectory(filePattern, directory));
+    }
+
+    protected boolean noMatchingFilesInDirectory(String filePattern, String directory) {
+        return findPatternInDirectory(filePattern, directory).size() == 0;
     }
 
     protected TreeSet<String> findPatternInDirectory(String filePattern, String directory) {

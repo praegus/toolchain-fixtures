@@ -214,6 +214,39 @@ public class CsvFileFixture extends FileFixture {
         return data;
     }
 
+    public int numberOfLines() {
+        return numberOfLinesIn(csvFile);
+    }
+
+    public int numberOfLinesIn(String fileName) {
+        return getLinesFromFile(fileName).size();
+    }
+
+    public int numberOfLinesWhereIs(String column, String lookupValue) {
+        return numberOfLinesWhereIsIn(column, lookupValue, csvFile);
+    }
+
+    public int numberOfLinesWhereIsIn(String column, String lookupValue, String filename) {
+        int result = 0;
+        try {
+            ArrayList<String> lines = getLinesFromFile(filename);
+            String[] columns = lines.get(0).split(separator);
+            int columnIndex = indexOfColumn(columns, column);
+
+            if (columnIndex >= 0) {
+                for (String line : lines) {
+                    String[] values = line.split(separator);
+                    if (values[columnIndex].equals(lookupValue)) {
+                        result++;
+                    }
+                }
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new SlimFixtureException("No row found where " + column + " is " + lookupValue);
+        }
+        return result;
+    }
+
     private ArrayList<String> getLinesFromFile(String filename) {
         String fullName = getFullName(filename);
         ensureParentExists(fullName);

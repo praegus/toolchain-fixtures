@@ -12,9 +12,9 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <fitnesse.version>20190716</fitnesse.version>
-        <hsac.version>4.6.1</hsac.version>
-        <google.api.version>1.30.2</google.api.version>
+        <fitnesse.version>20200108</fitnesse.version>
+        <hsac.version>4.10.0</hsac.version>
+        <google.api.version>1.30.7</google.api.version>
     </properties>
 
     <dependencies>
@@ -79,7 +79,7 @@
         <dependency>
             <groupId>com.google.oauth-client</groupId>
             <artifactId>google-oauth-client-jetty</artifactId>
-            <version>${google.api.version}</version>
+            <version>1.30.5</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.google.oauth-client</groupId>
@@ -149,6 +149,13 @@
             <groupId>org.mariuszgromada.math</groupId>
             <artifactId>MathParser.org-mXparser</artifactId>
             <version>4.4.0</version>
+        </dependency>
+
+        <!-- Websockets -->
+        <dependency>
+            <groupId>org.java-websocket</groupId>
+            <artifactId>Java-WebSocket</artifactId>
+            <version>1.4.0</version>
         </dependency>
 
 

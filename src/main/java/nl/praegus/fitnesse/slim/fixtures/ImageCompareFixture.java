@@ -5,12 +5,16 @@ import com.galenframework.rainbow4j.ImageCompareResult;
 import com.galenframework.rainbow4j.Rainbow4J;
 
 import javax.imageio.ImageIO;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 import nl.hsac.fitnesse.fixture.slim.SlimFixture;
+import nl.hsac.fitnesse.fixture.slim.SlimFixtureException;
 
 /**
  * Fixture to compare two images. Accepted file types: PNG, BMP, JPEG, GIF. Extends Slim fixture from
@@ -20,6 +24,7 @@ public class ImageCompareFixture extends SlimFixture {
     private final ComparisonOptions comparisonOptions = new ComparisonOptions();
     private double acceptedDifferencePercentage = 0.0;
     private String comparisonMapFileFormat = "png";
+    private List<Rectangle> ignoreRegions = new ArrayList<>();
 
     public void setAcceptedDifferencePercentage(double acceptedDifferencePercentage) {
         this.acceptedDifferencePercentage = acceptedDifferencePercentage;
@@ -69,6 +74,29 @@ public class ImageCompareFixture extends SlimFixture {
             result = true;
         }
         return result;
+    }
+
+    /**
+     * Add a region to ignore.
+     * A region is formatted as x, y, width, height in pixels. So 0,0,20,100 will ignore a region of 20x100px in the top left corner of the image
+     * @param region a comma separated list of integers (x,y,width,height)
+     */
+    public void addExcludeRegion(String region) {
+        String[] regionInfo = region.split(",");
+        if(regionInfo.length != 4) {
+            throw new SlimFixtureException(false, "A region consists of exactly 4 integers: x, y, width, height");
+        }
+        try {
+            Rectangle newRegion = new Rectangle(Integer.parseInt(regionInfo[0].trim()),
+                    Integer.parseInt(regionInfo[1].trim()),
+                    Integer.parseInt(regionInfo[2].trim()),
+                    Integer.parseInt(regionInfo[3].trim()));
+            ignoreRegions.add(newRegion);
+            comparisonOptions.setIgnoreRegions(ignoreRegions);
+        } catch (NumberFormatException e) {
+            throw new SlimFixtureException(false, "A region consists of exactly 4 integers: x, y, width, height", e);
+        }
+
     }
 
     /**
