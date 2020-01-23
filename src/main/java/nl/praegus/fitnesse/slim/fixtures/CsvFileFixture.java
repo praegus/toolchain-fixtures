@@ -3,12 +3,10 @@ package nl.praegus.fitnesse.slim.fixtures;
 import nl.hsac.fitnesse.fixture.slim.FileFixture;
 import nl.hsac.fitnesse.fixture.slim.SlimFixtureException;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
 
 public class CsvFileFixture extends FileFixture {
     private String separator = ",";
@@ -61,7 +59,7 @@ public class CsvFileFixture extends FileFixture {
         ArrayList<String> lines = getLinesFromFile(filename);
 
         try {
-            String[] columns = lines.get(0).split(separator);
+            String[] columns = getColumns(lines);
             int resultColumnIndex = indexOfColumn(columns, resultColumn);
 
             if (resultColumnIndex >= 0) {
@@ -102,7 +100,7 @@ public class CsvFileFixture extends FileFixture {
         ArrayList<String> lines = getLinesFromFile(filename);
 
         try {
-            String[] columns = lines.get(0).split(separator);
+            String[] columns = getColumns(lines);
             int resultColumnIndex = indexOfColumn(columns, resultColumn);
             String row = lines.get(rowNumber);
             String[] values = row.split(separator);
@@ -134,7 +132,7 @@ public class CsvFileFixture extends FileFixture {
     public String nameOfColumnIn(int column, String filename) {
         String result;
         ArrayList<String> lines = getLinesFromFile(filename);
-        String[] columns = lines.get(0).split(separator);
+        String[] columns = getColumns(lines);
         try {
             result = columns[column];
         } catch (ArrayIndexOutOfBoundsException e) {
@@ -176,7 +174,7 @@ public class CsvFileFixture extends FileFixture {
         Map<String, String> data = new HashMap<>();
         try {
             ArrayList<String> lines = getLinesFromFile(filename);
-            String[] columns = lines.get(0).split(separator);
+            String[] columns = getColumns(lines);
             int columnIndex = indexOfColumn(columns, column);
 
             if (columnIndex >= 0) {
@@ -230,7 +228,7 @@ public class CsvFileFixture extends FileFixture {
         int result = 0;
         try {
             ArrayList<String> lines = getLinesFromFile(filename);
-            String[] columns = lines.get(0).split(separator);
+            String[] columns = getColumns(lines);
             int columnIndex = indexOfColumn(columns, column);
 
             if (columnIndex >= 0) {
@@ -250,20 +248,16 @@ public class CsvFileFixture extends FileFixture {
     private ArrayList<String> getLinesFromFile(String filename) {
         String fullName = getFullName(filename);
         ensureParentExists(fullName);
-        java.io.File file = new File(fullName);
-
+        File file = new File(fullName);
         ArrayList<String> lines = new ArrayList<>();
-
-        try {
-            Scanner s = new Scanner(file);
-            while (s.hasNextLine()) {
-                lines.add(s.nextLine());
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                lines.add(line);
             }
-            s.close();
-        } catch (FileNotFoundException e) {
-            throw new SlimFixtureException(e.getMessage());
+        } catch (IOException e) {
+            throw new SlimFixtureException(e);
         }
-
         return lines;
     }
 
@@ -271,7 +265,7 @@ public class CsvFileFixture extends FileFixture {
         ArrayList<String> lines = getLinesFromFile(fileName);
         String result = "";
         try {
-            String[] columns = lines.get(0).split(separator);
+            String[] columns = getColumns(lines);
             int findColumnIndex = indexOfColumn(columns, findByColumn);
 
             if (findColumnIndex >= 0) {
@@ -287,6 +281,10 @@ public class CsvFileFixture extends FileFixture {
             throw new SlimFixtureException("No row found where " + findByColumn + " is " + findByColumnValue);
         }
         return result;
+    }
+
+    private String[] getColumns(ArrayList<String> lines) {
+        return lines.get(0).split(separator);
     }
 
     private int indexOfColumn(String[] columns, String columnName) {
