@@ -80,8 +80,8 @@ public class MendixBrowserTest extends BrowserTest<WebElement> {
     private int delayBeforeValue = 0;
     private int inputDelay = 0;
     private String progressIndicator = "css=.mx-progress-indicator";
-    private String xpathForHeadTable = "//table[contains(@class, 'mx-datagrid-head-table')]";
-    private String xpathForBodyTable = "//table[contains(@class, 'mx-datagrid-body-table')]";
+    private String xpathForHeadTable = ".//table[contains(@class, 'mx-datagrid-head-table')]";
+    private String xpathForBodyTable = ".//table[contains(@class, 'mx-datagrid-body-table')]";
 
 
     /**
@@ -141,13 +141,6 @@ public class MendixBrowserTest extends BrowserTest<WebElement> {
         }
     }
 
-    @WaitUntil(TimeoutPolicy.RETURN_NULL)
-    public Integer numberOfItems(String xPath) {
-        if (xPath.startsWith("xpath=")) {
-            xPath = xPath.substring(6);
-        }
-        return getSeleniumHelper().findElements(By.xpath(xPath)).size();
-    }
 
     @Override
     public boolean selectForIn(String value, String place, String container) {
@@ -161,16 +154,6 @@ public class MendixBrowserTest extends BrowserTest<WebElement> {
         return super.selectFor(value, place);
     }
 
-
-    public boolean clickItems(String listOfItems) {
-        String[] items = listOfItems.split(";");
-        for (String item : items) {
-            if (!click(item.trim())) {
-                return false;
-            }
-        }
-        return true;
-    }
 
     public String getCsrfToken() {
         return getSeleniumHelper().executeJavascript("return window.mx.session.sessionData.csrftoken").toString();
@@ -226,11 +209,9 @@ public class MendixBrowserTest extends BrowserTest<WebElement> {
         int requestedColumnIndex = columnIndex(xpathForHeadTable, requestedColumnName);
 
         String xpath = String.format("%s//td[%s][normalize-space(descendant-or-self::text())='%s']/parent::tr/td[%s]", xpathForBodyTable, selectColumnIndex, selectOnValue, requestedColumnIndex);
+        return getElement("xpath=" + xpath);
 
-        return getSeleniumHelper().findByXPath(xpath);
     }
-
-
 
     private int columnIndex(String tableXpath, String columnName) {
         int precedingColumns = getSeleniumHelper().findElements(By.xpath(String.format("%s//th[normalize-space(descendant-or-self::text())='%s']/preceding-sibling::th", tableXpath, columnName))).size();
