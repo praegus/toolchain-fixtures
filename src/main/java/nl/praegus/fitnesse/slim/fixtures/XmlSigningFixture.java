@@ -7,9 +7,8 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.dom.SOAPConstants;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.message.WSSecEncrypt;
-import org.apache.wss4j.dom.message.WSSecHeader;
-import org.apache.wss4j.dom.message.WSSecSignature;
+import org.apache.wss4j.dom.message.*;
+import org.apache.wss4j.dom.message.token.UsernameToken;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
@@ -33,7 +32,16 @@ public class XmlSigningFixture extends SlimFixture {
     }
 
     private Properties signatureProperties = new Properties();
+    private String user;
+    private String password;
 
+    public void setUser(String user) {
+        this.user = user;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
     public void setKeyStore(String keyStore) {
         signatureProperties.put("org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin");
@@ -70,7 +78,20 @@ public class XmlSigningFixture extends SlimFixture {
             soapBody.addAttribute(name, "Body");
 
             Document doc = soapBody.getOwnerDocument();
-            Crypto crypto = CryptoFactory.getInstance(signatureProperties); //File
+            doc = addSignature(doc);
+            doc = addUsernameToken(doc);
+            doc = addTimestamp(doc);
+
+            return org.apache.wss4j.common.util.XMLUtils.prettyDocumentToString(doc);
+
+        } catch (Exception e) {
+            throw new SlimFixtureException(true, "ERR", e);
+        }
+    }
+
+    private Document addSignature(Document doc) {
+        try {
+            Crypto crypto = CryptoFactory.getInstance(signatureProperties);
 
             WSSecHeader secHeader = new WSSecHeader(doc);
             secHeader.insertSecurityHeader();
@@ -81,14 +102,40 @@ public class XmlSigningFixture extends SlimFixture {
             sign.setUseSingleCertificate(true);
             sign.setDigestAlgo(DigestMethod.SHA256);
 
-            Document signedDoc = sign.build(crypto);
+            return sign.build(crypto);
+        } catch (Exception e) {
+            throw new SlimFixtureException(true, "ERR", e);
+        }
+    }
 
-            ret = org.apache.wss4j.common.util.XMLUtils.prettyDocumentToString(signedDoc);
+    private Document addTimestamp(Document doc) {
+        try {
+            WSSecHeader secHeader = new WSSecHeader(doc);
+            secHeader.insertSecurityHeader();
+            WSSecTimestamp timestamp = new WSSecTimestamp(secHeader);
+            timestamp.setTimeToLive(300);
+            timestamp.setPrecisionInMilliSeconds(true);
+            return timestamp.build();
+        } catch (Exception e) {
+            throw new SlimFixtureException(true, "ERR", e);
+        }
+    }
+
+    private Document addUsernameToken(Document doc) {
+        try{
+            WSSecHeader secHeader = new WSSecHeader(doc);
+            secHeader.insertSecurityHeader();
+
+            WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
+            builder.setPasswordType(WSConstants.PW_DIGEST);
+            builder.setUserInfo(user, password);
+            builder.addNonce();
+            builder.addCreated();
+            return builder.build();
 
         } catch (Exception e) {
             throw new SlimFixtureException(true, "ERR", e);
         }
-        return ret;
     }
 }
 
