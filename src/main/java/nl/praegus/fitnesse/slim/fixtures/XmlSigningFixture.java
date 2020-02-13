@@ -1,27 +1,21 @@
 package nl.praegus.fitnesse.slim.fixtures;
 
+import nl.hsac.fitnesse.fixture.Environment;
 import nl.hsac.fitnesse.fixture.slim.SlimFixture;
 import nl.hsac.fitnesse.fixture.slim.SlimFixtureException;
-import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
-import org.apache.wss4j.dom.SOAPConstants;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.message.*;
-import org.apache.wss4j.dom.message.token.UsernameToken;
-import org.apache.wss4j.dom.util.WSSecurityUtil;
+import org.apache.wss4j.dom.message.WSSecHeader;
+import org.apache.wss4j.dom.message.WSSecSignature;
+import org.apache.wss4j.dom.message.WSSecTimestamp;
+import org.apache.wss4j.dom.message.WSSecUsernameToken;
 import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
 
 import javax.xml.crypto.dsig.DigestMethod;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.soap.*;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 
 
@@ -78,11 +72,11 @@ public class XmlSigningFixture extends SlimFixture {
             soapBody.addAttribute(name, "Body");
 
             Document doc = soapBody.getOwnerDocument();
-            doc = addSignature(doc);
-            doc = addUsernameToken(doc);
             doc = addTimestamp(doc);
+            doc = addUsernameToken(doc);
+            doc = addSignature(doc);
 
-            return org.apache.wss4j.common.util.XMLUtils.prettyDocumentToString(doc);
+            return Environment.getInstance().getHtmlForXml(org.apache.wss4j.common.util.XMLUtils.prettyDocumentToString(doc));
 
         } catch (Exception e) {
             throw new SlimFixtureException(true, "ERR", e);
@@ -127,7 +121,6 @@ public class XmlSigningFixture extends SlimFixture {
             secHeader.insertSecurityHeader();
 
             WSSecUsernameToken builder = new WSSecUsernameToken(secHeader);
-            builder.setPasswordType(WSConstants.PW_DIGEST);
             builder.setUserInfo(user, password);
             builder.addNonce();
             builder.addCreated();
