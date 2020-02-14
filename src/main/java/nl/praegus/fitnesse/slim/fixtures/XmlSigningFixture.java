@@ -12,6 +12,7 @@ import org.apache.wss4j.dom.message.WSSecTimestamp;
 import org.apache.wss4j.dom.message.WSSecUsernameToken;
 import org.w3c.dom.Document;
 
+import javax.xml.crypto.dsig.CanonicalizationMethod;
 import javax.xml.crypto.dsig.DigestMethod;
 import javax.xml.soap.*;
 import java.io.ByteArrayInputStream;
@@ -92,9 +93,12 @@ public class XmlSigningFixture extends SlimFixture {
 
             WSSecSignature sign = new WSSecSignature(secHeader);
             sign.setUserInfo(signatureProperties.getProperty("org.apache.ws.security.crypto.merlin.keystore.alias"), signatureProperties.getProperty("privatekeypassword"));
-            sign.setKeyIdentifierType(WSConstants.BST_DIRECT_REFERENCE); // Binary Security Token - SecurityTokenReference
-            sign.setUseSingleCertificate(true);
-            sign.setDigestAlgo(DigestMethod.SHA256);
+            sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
+            sign.setUseSingleCertificate(false);
+            sign.setSigCanonicalization(CanonicalizationMethod.EXCLUSIVE);
+            sign.setDigestAlgo(DigestMethod.SHA1);
+
+
 
             return sign.build(crypto);
         } catch (Exception e) {
