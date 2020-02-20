@@ -1,5 +1,6 @@
 package nl.praegus.fitnesse.slim.fixtures;
 
+import fitnesse.html.HtmlUtil;
 import nl.hsac.fitnesse.fixture.Environment;
 import nl.hsac.fitnesse.fixture.slim.SlimFixture;
 import nl.hsac.fitnesse.fixture.slim.SlimFixtureException;
@@ -70,7 +71,7 @@ public class XmlSigningFixture extends SlimFixture {
                     "http://schemas.xmlsoap.org/soap/security/2000-12");
 
             SOAPBody soapBody = soapEnvelope.getBody();
-            soapBody.addAttribute(name, "Body");
+            //soapBody.addAttribute(name, "Body");
 
             Document doc = soapBody.getOwnerDocument();
             doc = addTimestamp(doc);
@@ -92,15 +93,15 @@ public class XmlSigningFixture extends SlimFixture {
             secHeader.insertSecurityHeader();
 
             WSSecSignature sign = new WSSecSignature(secHeader);
-            sign.setUserInfo(signatureProperties.getProperty("org.apache.ws.security.crypto.merlin.keystore.alias"), signatureProperties.getProperty("privatekeypassword"));
+            sign.setUserInfo(signatureProperties.getProperty("org.apache.ws.security.crypto.merlin.keystore.alias"),
+                    signatureProperties.getProperty("privatekeypassword"));
             sign.setKeyIdentifierType(WSConstants.ISSUER_SERIAL);
             sign.setUseSingleCertificate(false);
             sign.setSigCanonicalization(CanonicalizationMethod.EXCLUSIVE);
             sign.setDigestAlgo(DigestMethod.SHA1);
 
-
-
             return sign.build(crypto);
+
         } catch (Exception e) {
             throw new SlimFixtureException(true, "ERR", e);
         }
