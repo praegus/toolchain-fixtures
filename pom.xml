@@ -145,6 +145,23 @@
             <version>4.1.0</version>
         </dependency>
 
+        <!-- SOAP Signing -->
+        <dependency>
+            <groupId>org.apache.wss4j</groupId>
+            <artifactId>wss4j-ws-security-common</artifactId>
+            <version>2.2.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.wss4j</groupId>
+            <artifactId>wss4j-ws-security-dom</artifactId>
+            <version>2.2.4</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.messaging.saaj</groupId>
+            <artifactId>saaj-impl</artifactId>
+            <version>1.5.1</version>
+        </dependency>
+
         <!-- Calculator -->
         <dependency>
             <groupId>org.mariuszgromada.math</groupId>
@@ -250,8 +267,9 @@
                     <docletArtifact>
                         <groupId>nl.praegus</groupId>
                         <artifactId>fixture-doc-generator</artifactId>
-                        <version>1.0</version>
+                        <version>1.1</version>
                     </docletArtifact>
+
                     <excludePackageNames>nl.hsac.*</excludePackageNames>
                     <includeDependencySources>true</includeDependencySources>
                     <dependencySourceIncludes>
