@@ -76,7 +76,7 @@ public class PdfCompare extends FileFixture {
         try {
             PdfComparator comparator = new PdfComparator(this.expected, this.actual);
             for (PageArea exclusion : exclusions) {
-                comparator = comparator.with(exclusion);
+                comparator = comparator.withIgnore(exclusion);
             }
             result = comparator.compare();
         } catch (IOException e) {
