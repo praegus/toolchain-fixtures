@@ -3,3 +3,4 @@ target/*
 .idea/**
 /FitNesseRoot/files/fileFixture/file.html
 /FitNesseRoot/files/comparison-map-*
+META-INF/*
