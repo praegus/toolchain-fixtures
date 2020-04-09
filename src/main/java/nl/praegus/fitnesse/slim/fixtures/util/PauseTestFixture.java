@@ -72,7 +72,7 @@ public class PauseTestFixture extends SlimFixture {
             JFrame jf=new JFrame();
             jf.setLocation(0,0);
             jf.setAlwaysOnTop(true);
-            URL iconUrl = getClass().getClassLoader().getResource("fitnesse.png");
+            URL iconUrl = getClass().getClassLoader().getResource("fitnesse_dbg.png");
             if (null != iconUrl) {
                 icon = new ImageIcon(iconUrl);
             } else {
