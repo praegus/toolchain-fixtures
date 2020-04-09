@@ -4,3 +4,4 @@ target/*
 /FitNesseRoot/files/fileFixture/file.html
 /FitNesseRoot/files/comparison-map-*
 META-INF/*
+src/main/resources/META-INF/apidocs
