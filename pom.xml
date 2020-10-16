@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>nl.praegus</groupId>
@@ -12,8 +13,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <fitnesse.version>20200205</fitnesse.version>
-        <hsac.version>4.11.0</hsac.version>
+        <fitnesse.version>20200501</fitnesse.version>
+        <hsac.version>4.20.0</hsac.version>
         <google.api.version>1.30.7</google.api.version>
     </properties>
 
@@ -29,12 +30,6 @@
             <artifactId>hsac-fitnesse-fixtures</artifactId>
             <version>${hsac.version}</version>
             <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-lang3</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <!-- SSH -->
         <dependency>
@@ -111,6 +106,18 @@
             <groupId>de.redsix</groupId>
             <artifactId>pdfcompare</artifactId>
             <version>1.1.43</version>
+            <exclusions>
+                <exclusion>
+                    <!--fitnesse and hsac use slf4j-->
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-classic</artifactId>
+                </exclusion>
+                <exclusion>
+                    <!--use fitnese version-->
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- TOTP fixture -->
@@ -121,6 +128,7 @@
             <version>1.2.0</version>
             <exclusions>
                 <exclusion>
+                    <!--use hsac version-->
                     <groupId>org.apache.httpcomponents</groupId>
                     <artifactId>httpclient</artifactId>
                 </exclusion>
@@ -151,6 +159,18 @@
             <groupId>com.microsoft.azure</groupId>
             <artifactId>adal4j</artifactId>
             <version>1.6.5</version>
+            <exclusions>
+                <exclusion>
+                    <!--use fitnese version-->
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-lang3</artifactId>
+                </exclusion>
+                <exclusion>
+                    <!--use fitnese version-->
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- SOAP Signing -->
@@ -158,6 +178,16 @@
             <groupId>org.apache.wss4j</groupId>
             <artifactId>wss4j-ws-security-common</artifactId>
             <version>2.2.4</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-codec</groupId>
+                    <artifactId>commons-codec</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.wss4j</groupId>
@@ -261,6 +291,7 @@
             <plugin>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <extensions>true</extensions>
+                <version>3.2.0</version>
                 <executions>
                     <execution>
                         <phase>generate-resources</phase>
