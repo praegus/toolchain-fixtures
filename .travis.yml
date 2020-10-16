@@ -9,7 +9,7 @@ jobs:
   include:
     - stage: build
       jdk: openjdk8
-      script: mvn clean test sonar:sonar -Dsonar.projectKey=toolchain-fixtures -Dsonar.host.url=$SONAR_ENDPOINT -Dsonar.login=$SONAR_LOGIN -Dsonar.scm.disabled=true
+      script: mvn clean test
       branches:
         except:
           - master
