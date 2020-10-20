@@ -50,22 +50,32 @@
             <version>${google.api.version}</version>
             <exclusions>
                 <exclusion>
+                    <!--conflicts with HSAC version-->
                     <groupId>com.google.guava</groupId>
                     <artifactId>guava</artifactId>
                 </exclusion>
                 <exclusion>
+                    <!--conflicts with HSAC version-->
                     <groupId>com.google.code.findbugs</groupId>
                     <artifactId>jsr305</artifactId>
                 </exclusion>
                 <exclusion>
+                    <!--conflicts with HSAC version-->
                     <groupId>com.fasterxml.jackson.core</groupId>
                     <artifactId>jackson-core</artifactId>
                 </exclusion>
                 <exclusion>
+                    <!--conflicts with HSAC version-->
                     <groupId>org.apache.httpcomponents</groupId>
                     <artifactId>httpclient</artifactId>
                 </exclusion>
                 <exclusion>
+                    <!--conflicts with HSAC version-->
+                    <groupId>org.apache.httpcomponents</groupId>
+                    <artifactId>httpcore</artifactId>
+                </exclusion>
+                <exclusion>
+                    <!--conflicts with HSAC version-->
                     <groupId>com.google.j2objc</groupId>
                     <artifactId>j2objc-annotations</artifactId>
                 </exclusion>
@@ -77,6 +87,7 @@
             <version>1.30.5</version>
             <exclusions>
                 <exclusion>
+                    <!--conflicts with google-api-client-->
                     <groupId>com.google.oauth-client</groupId>
                     <artifactId>google-oauth-client</artifactId>
                 </exclusion>
@@ -88,6 +99,7 @@
             <version>v1-rev20191113-1.30.3</version>
             <exclusions>
                 <exclusion>
+                    <!--conflicts with the direct dependency google-api-client-->
                     <groupId>com.google.api-client</groupId>
                     <artifactId>google-api-client</artifactId>
                 </exclusion>
@@ -108,12 +120,12 @@
             <version>1.1.43</version>
             <exclusions>
                 <exclusion>
-                    <!--fitnesse and hsac use slf4j-->
+                    <!--FitNesse and hsac use slf4j-->
                     <groupId>ch.qos.logback</groupId>
                     <artifactId>logback-classic</artifactId>
                 </exclusion>
                 <exclusion>
-                    <!--use fitnese version-->
+                    <!--use FitNesse version-->
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-api</artifactId>
                 </exclusion>
@@ -161,14 +173,26 @@
             <version>1.6.5</version>
             <exclusions>
                 <exclusion>
-                    <!--use fitnese version-->
+                    <!--use FitNesse version-->
                     <groupId>org.apache.commons</groupId>
                     <artifactId>commons-lang3</artifactId>
                 </exclusion>
                 <exclusion>
-                    <!--use fitnese version-->
+                    <groupId>commons-codec</groupId>
+                    <artifactId>commons-codec</artifactId>
+                </exclusion>
+                <exclusion>
+                    <!--use FitNesse version-->
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.code.gson</groupId>
+                    <artifactId>gson</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>net.minidev</groupId>
+                    <artifactId>json-smart</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -183,6 +207,14 @@
                 <exclusion>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>commons-codec</groupId>
+                    <artifactId>commons-codec</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
