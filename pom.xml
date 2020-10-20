@@ -125,7 +125,7 @@
                     <artifactId>logback-classic</artifactId>
                 </exclusion>
                 <exclusion>
-                    <!--use FitNesse version-->
+                    <!--conflicts with FitNesse version-->
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-api</artifactId>
                 </exclusion>
@@ -139,8 +139,8 @@
             <artifactId>googleauth</artifactId>
             <version>1.2.0</version>
             <exclusions>
+                <!--conflicts with hsac version-->
                 <exclusion>
-                    <!--use hsac version-->
                     <groupId>org.apache.httpcomponents</groupId>
                     <artifactId>httpclient</artifactId>
                 </exclusion>
@@ -172,24 +172,27 @@
             <artifactId>adal4j</artifactId>
             <version>1.6.5</version>
             <exclusions>
+                <!--conflicts with FitNesse version-->
                 <exclusion>
-                    <!--use FitNesse version-->
                     <groupId>org.apache.commons</groupId>
                     <artifactId>commons-lang3</artifactId>
                 </exclusion>
+                <!--conflicts with googleauth commons-codec version-->
                 <exclusion>
                     <groupId>commons-codec</groupId>
                     <artifactId>commons-codec</artifactId>
                 </exclusion>
+                <!--conflicts with FitNesse version-->
                 <exclusion>
-                    <!--use FitNesse version-->
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-api</artifactId>
                 </exclusion>
+                <!--conflicts with HSAC version-->
                 <exclusion>
                     <groupId>com.google.code.gson</groupId>
                     <artifactId>gson</artifactId>
                 </exclusion>
+                <!--conflicts with HSAC version-->
                 <exclusion>
                     <groupId>net.minidev</groupId>
                     <artifactId>json-smart</artifactId>
@@ -203,15 +206,17 @@
             <artifactId>wss4j-ws-security-common</artifactId>
             <version>2.2.4</version>
             <exclusions>
-                <!--use FitNesse version-->
+                <!--conflicts with FitNesse version-->
                 <exclusion>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-api</artifactId>
                 </exclusion>
+                <!--conflicts with googleauth commons-codec version-->
                 <exclusion>
                     <groupId>commons-codec</groupId>
                     <artifactId>commons-codec</artifactId>
                 </exclusion>
+                <!--conflicts with HSAC version-->
                 <exclusion>
                     <groupId>com.google.guava</groupId>
                     <artifactId>guava</artifactId>
