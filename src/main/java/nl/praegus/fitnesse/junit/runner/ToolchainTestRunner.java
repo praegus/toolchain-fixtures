@@ -8,6 +8,7 @@ import nl.praegus.fitnesse.junit.testsystemlisteners.ConsoleLogListener;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.model.InitializationError;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 
@@ -27,6 +28,10 @@ public class ToolchainTestRunner extends HsacFitNesseRunner {
     @Override
     protected void addTestSystemListeners(RunNotifier notifier, MultipleTestsRunner testRunner, Class<?> suiteClass, DescriptionFactory descriptionFactory) {
         super.addTestSystemListeners(notifier, testRunner, suiteClass, descriptionFactory);
-        testRunner.addTestSystemListener(new ConsoleLogListener());
+        try {
+            testRunner.addTestSystemListener(new ConsoleLogListener());
+        } catch (UnsupportedEncodingException e) {
+            System.err.println(e.getMessage());
+        }
     }
 }

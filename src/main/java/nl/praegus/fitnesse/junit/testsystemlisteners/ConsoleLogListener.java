@@ -3,12 +3,19 @@ package nl.praegus.fitnesse.junit.testsystemlisteners;
 import fitnesse.testsystems.*;
 import nl.praegus.fitnesse.junit.testsystemlisteners.util.ConsoleOutputChunkParser;
 
+import java.io.BufferedWriter;
 import java.io.Closeable;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Locale;
+
+import static java.nio.charset.StandardCharsets.US_ASCII;
 
 public class ConsoleLogListener implements TestSystemListener, Closeable {
     private final String NEWLINE = System.getProperty("line.separator");
@@ -17,6 +24,22 @@ public class ConsoleLogListener implements TestSystemListener, Closeable {
             DateTimeFormatter.ofLocalizedDateTime( FormatStyle.SHORT )
                     .withLocale( Locale.getDefault() )
                     .withZone( ZoneId.systemDefault() );
+
+    private final BufferedWriter out;
+
+    public ConsoleLogListener() throws UnsupportedEncodingException {
+        out = new BufferedWriter(new OutputStreamWriter(new
+                FileOutputStream(java.io.FileDescriptor.out), US_ASCII), 512);
+    }
+
+    private void writeln(String line) {
+        try {
+            out.write(line);
+            out.write('\n');
+        } catch (IOException e) {
+            System.out.println(line);
+        }
+    }
 
     @Override
     public void testSystemStarted(TestSystem testSystem) {
@@ -34,18 +57,18 @@ public class ConsoleLogListener implements TestSystemListener, Closeable {
             if(!output.endsWith(NEWLINE)) {
                 output += NEWLINE;
             }
-            System.out.println(output);
+            writeln(output);
         }
     }
 
     @Override
     public void testStarted(TestPage testPage) {
-        System.out.println("\r\n" + timeFmt.format(Instant.now()) + " - Test Started: " + testPage.getFullPath());
+        writeln("\r\n" + timeFmt.format(Instant.now()) + " - Test Started: " + testPage.getFullPath());
     }
 
     @Override
     public void testComplete(TestPage testPage, TestSummary testSummary) {
-        System.out.println(parser.printSummary(testPage.getFullPath(), testSummary.toString()));
+        writeln(parser.printSummary(testPage.getFullPath(), testSummary.toString()));
     }
 
     @Override
