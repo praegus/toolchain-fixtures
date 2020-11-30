@@ -35,7 +35,7 @@ public class CsvFileFixture extends FileFixture {
      * usage: | value of | [resultColumn] | in row where | [findByColumn] | is | [findByColumnValue] |
      *
      * @param resultColumn      The column to extract the value from
-     * @param findByColumn      The column that contans the given value
+     * @param findByColumn      The column that contains the given value
      * @param findByColumnValue The value to search for
      * @return The value of 'resultColumn' in the row where 'findByColumn' has the value 'findByColumnValue'
      */
