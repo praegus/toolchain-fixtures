@@ -12,17 +12,18 @@ import java.util.concurrent.Future;
 
 public class MsTokenGenerator {
 
-    private String CLIENT_ID = "607f22ad-6a7c-4bf9-b7c4-31cb38cc5dd8";
-    private String RESOURCE_URI = "api://e484142b-94f5-411e-8759-d7f1d98f288d";
-    private String AUTHORITY = "https://login.microsoftonline.com/e22802fd-166f-46cb-89db-dc0e37b86361";
+    private String CLIENT_ID;
+    private String RESOURCE_URI;
+    private String AUTHORITY;
     private AuthenticationResult lastResult;
 
     /**
      * Generate access & refresh tokens using microsoft login.
      * To use this fixture, the allowPublicClient key in your application's manifest must be set to true.
-     * Set clientId, resourceUri and authority befaore authenticating.
+     * Set clientId, resourceUri and authority before authenticating.
      */
-    public MsTokenGenerator() {}
+    public MsTokenGenerator() {
+    }
 
     /**
      * Generate access & refresh tokens using microsoft login.
