@@ -13,8 +13,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <fitnesse.version>20200501</fitnesse.version>
-        <hsac.version>4.22.0</hsac.version>
+        <fitnesse.version>20201213</fitnesse.version>
+        <hsac.version>4.23.1</hsac.version>
         <google.api.version>1.30.7</google.api.version>
     </properties>
 
