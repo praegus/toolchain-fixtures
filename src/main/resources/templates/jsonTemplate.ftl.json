@@ -20,7 +20,7 @@
         <#if item?is_string>
         <#assign obj = '"' + item + '"'>
         <#else>
-        <#assign obj = item>
+        <#assign obj = item?c>
         </#if>
     </#if>
     <#return obj>
