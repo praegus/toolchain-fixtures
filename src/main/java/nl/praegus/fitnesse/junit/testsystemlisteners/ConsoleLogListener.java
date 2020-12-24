@@ -3,10 +3,13 @@ package nl.praegus.fitnesse.junit.testsystemlisteners;
 import fitnesse.testsystems.*;
 import nl.praegus.fitnesse.junit.testsystemlisteners.util.ConsoleOutputChunkParser;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.Closeable;
+import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.time.Instant;
@@ -25,16 +28,15 @@ public class ConsoleLogListener implements TestSystemListener, Closeable {
                     .withLocale( Locale.getDefault() )
                     .withZone( ZoneId.systemDefault() );
 
-    private final BufferedWriter out;
+    private final OutputStream out;
 
     public ConsoleLogListener() throws UnsupportedEncodingException {
-        out = new BufferedWriter(new OutputStreamWriter(new
-                FileOutputStream(java.io.FileDescriptor.out), US_ASCII), 512);
+        out = new BufferedOutputStream( System.out );
     }
 
     private void writeln(String line) {
         try {
-            out.write(line);
+            out.write(line.getBytes());
             out.write('\n');
         } catch (IOException e) {
             System.out.println(line);
