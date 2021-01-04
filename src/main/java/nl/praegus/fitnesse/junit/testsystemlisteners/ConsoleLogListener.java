@@ -1,37 +1,36 @@
 package nl.praegus.fitnesse.junit.testsystemlisteners;
 
-import fitnesse.testsystems.*;
+import fitnesse.testsystems.Assertion;
+import fitnesse.testsystems.ExceptionResult;
+import fitnesse.testsystems.TestPage;
+import fitnesse.testsystems.TestResult;
+import fitnesse.testsystems.TestSummary;
+import fitnesse.testsystems.TestSystem;
+import fitnesse.testsystems.TestSystemListener;
 import nl.praegus.fitnesse.junit.testsystemlisteners.util.ConsoleOutputChunkParser;
 
 import java.io.BufferedOutputStream;
-import java.io.BufferedWriter;
 import java.io.Closeable;
-import java.io.FileDescriptor;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Locale;
 
-import static java.nio.charset.StandardCharsets.US_ASCII;
-
 public class ConsoleLogListener implements TestSystemListener, Closeable {
     private final String NEWLINE = System.getProperty("line.separator");
     private final ConsoleOutputChunkParser parser = new ConsoleOutputChunkParser();
     private final DateTimeFormatter timeFmt =
-            DateTimeFormatter.ofLocalizedDateTime( FormatStyle.SHORT )
-                    .withLocale( Locale.getDefault() )
-                    .withZone( ZoneId.systemDefault() );
+            DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
+                    .withLocale(Locale.getDefault())
+                    .withZone(ZoneId.systemDefault());
 
     private final OutputStream out;
 
-    public ConsoleLogListener() throws UnsupportedEncodingException {
-        out = new BufferedOutputStream( System.out );
+    public ConsoleLogListener() {
+        out = new BufferedOutputStream(System.out);
     }
 
     private void writeln(String line) {
@@ -56,7 +55,7 @@ public class ConsoleLogListener implements TestSystemListener, Closeable {
             output = parser.sanitizeRemainingHtml(output);
             output = parser.applyConsoleColoring(output);
 
-            if(!output.endsWith(NEWLINE)) {
+            if (!output.endsWith(NEWLINE)) {
                 output += NEWLINE;
             }
             writeln(output);
