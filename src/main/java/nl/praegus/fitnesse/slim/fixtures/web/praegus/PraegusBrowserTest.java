@@ -18,7 +18,7 @@ import java.lang.reflect.Method;
 public class PraegusBrowserTest<T extends WebElement> extends BrowserTest<T> {
 
     private boolean blurAfterSendingText = false;
-    private boolean abortOnException = true;
+    private boolean abortOnException = false;
 
     public void blurAfterSendingText(boolean blurAfterSendingText) {
         this.blurAfterSendingText = blurAfterSendingText;
