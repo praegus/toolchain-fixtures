@@ -5,3 +5,6 @@ target/*
 /FitNesseRoot/files/comparison-map-*
 META-INF/*
 src/main/resources/META-INF/apidocs
+.project
+.classpath
+.settings/*
