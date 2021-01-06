@@ -48,6 +48,9 @@ A fixture to read/write String data from/to xls files.
 A fixture that calculates the result of mathematical expression (input as String)
 Returns whole numbers by default, precision can be added to the constructor. 
 
+### Mock server
+A Fixture that allows advanced mocking, proxying and forwarding for HTTP(S)
+
 ## Other extra's
 
 ### Console log listener
