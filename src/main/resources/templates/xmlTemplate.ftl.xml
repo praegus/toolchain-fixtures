@@ -2,7 +2,7 @@
     <#if item?is_hash>
         <#assign obj = "">
         <#list item as k, v>
-            <#assign obj += '<${k}>' + output(v) + "</${k}>">
+            <#assign obj += '<${k}>' + output(v) + "</${k?split(\" \")?first}>">
         </#list>
     <#elseif item?is_sequence>
         <#assign obj = "">
@@ -16,3 +16,4 @@
 </#function>
 <?xml version="1.0" encoding="UTF-8"?>
 ${output(testdata)}
+
