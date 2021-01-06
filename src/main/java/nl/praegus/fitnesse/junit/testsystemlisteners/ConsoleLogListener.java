@@ -12,7 +12,6 @@ import nl.praegus.fitnesse.junit.testsystemlisteners.util.ConsoleOutputChunkPars
 import java.io.BufferedOutputStream;
 import java.io.Closeable;
 import java.io.IOException;
-import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
@@ -71,7 +70,7 @@ public class ConsoleLogListener implements TestSystemListener, Closeable {
 
     @Override
     public void testStarted(TestPage testPage) {
-        writeln("\r\n" + " - Output for: " + testPage.getFullPath());
+        writeln("\r\n" + "[OUTPUT] for: " + testPage.getFullPath());
     }
 
     @Override
