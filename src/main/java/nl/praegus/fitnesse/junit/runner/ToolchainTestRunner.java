@@ -28,10 +28,6 @@ public class ToolchainTestRunner extends HsacFitNesseRunner {
     @Override
     protected void addTestSystemListeners(RunNotifier notifier, MultipleTestsRunner testRunner, Class<?> suiteClass, DescriptionFactory descriptionFactory) {
         super.addTestSystemListeners(notifier, testRunner, suiteClass, descriptionFactory);
-        try {
             testRunner.addTestSystemListener(new ConsoleLogListener());
-        } catch (UnsupportedEncodingException e) {
-            System.err.println(e.getMessage());
-        }
     }
 }
