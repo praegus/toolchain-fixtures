@@ -17,7 +17,7 @@ import java.nio.file.Paths;
  */
 public class ExcelFileFixture extends SlimFixture {
 
-    private String directory = new File(filesDir, "xls").getPath() + File.separator;
+    private final String directory = new File(filesDir, "xls").getPath() + File.separator;
     private String excelFile;
     private XSSFWorkbook workbook;
 

@@ -12,7 +12,6 @@ import nl.praegus.fitnesse.junit.testsystemlisteners.util.ConsoleOutputChunkPars
 import java.io.BufferedOutputStream;
 import java.io.Closeable;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -27,7 +26,7 @@ public class ConsoleLogListener implements TestSystemListener, Closeable {
                     .withLocale(Locale.getDefault())
                     .withZone(ZoneId.systemDefault());
 
-    private final OutputStream out;
+    private final BufferedOutputStream out;
 
     public ConsoleLogListener() {
         out = new BufferedOutputStream(System.out);
@@ -39,6 +38,14 @@ public class ConsoleLogListener implements TestSystemListener, Closeable {
             out.write('\n');
         } catch (IOException e) {
             System.out.println(line);
+        }
+    }
+
+    private void flushTestOutputToConsole() {
+        try {
+            out.flush();
+        } catch (IOException e) {
+            System.err.println("Error writing test output: " + e.getMessage());
         }
     }
 
@@ -64,12 +71,13 @@ public class ConsoleLogListener implements TestSystemListener, Closeable {
 
     @Override
     public void testStarted(TestPage testPage) {
-        writeln("\r\n" + timeFmt.format(Instant.now()) + " - Test Started: " + testPage.getFullPath());
+        writeln("\r\n" + " - Output for: " + testPage.getFullPath());
     }
 
     @Override
     public void testComplete(TestPage testPage, TestSummary testSummary) {
         writeln(parser.printSummary(testPage.getFullPath(), testSummary.toString()));
+        flushTestOutputToConsole();
     }
 
     @Override

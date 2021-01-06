@@ -15,7 +15,7 @@ public class CsvFileFixture extends FileFixture {
     /**
      * Define a separator character to use. Defaults to comma.
      *
-     * @param separator
+     * @param separator The delimiter that separates the fields
      */
     public void setSeparator(String separator) {
         this.separator = separator;
@@ -24,7 +24,7 @@ public class CsvFileFixture extends FileFixture {
     /**
      * Set the file to work with
      *
-     * @param csvFile
+     * @param csvFile The file to use
      */
     public void setCsvFile(String csvFile) {
         this.csvFile = csvFile;
@@ -75,11 +75,11 @@ public class CsvFileFixture extends FileFixture {
     }
 
     /**
-     * The value of 'reultColumn' in the nth row.
+     * The value of 'resultColumn' in the nth row.
      * Usage: | value of | [resultColumn] | in row number | [number] |
      *
-     * @param resultColumn
-     * @param rowNumber
+     * @param resultColumn the column name of the column value to retrieve
+     * @param rowNumber the row number to retrieve the value from
      * @return The value of the specified column in the specified row number
      */
     public String valueOfInRowNumber(String resultColumn, int rowNumber) {
@@ -90,9 +90,9 @@ public class CsvFileFixture extends FileFixture {
      * The value of 'reultColumn' in the nth row in a given file
      * Usage: | value of | [resultColumn] | in row number | [number] | in | [filename] |
      *
-     * @param resultColumn
-     * @param rowNumber
-     * @param filename
+     * @param resultColumn The column name of the column value to retrieve
+     * @param rowNumber The row number to retrieve the value from
+     * @param filename The file to search in
      * @return The value of the specified column in the specified row number in the given file
      */
     public String valueOfInRowNumberIn(String resultColumn, int rowNumber, String filename) {

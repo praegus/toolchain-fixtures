@@ -1,13 +1,18 @@
 package nl.praegus.fitnesse.slim.fixtures.mockserver;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import nl.hsac.fitnesse.fixture.slim.SlimFixture;
 import nl.hsac.fitnesse.fixture.slim.SlimFixtureException;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.HttpForward;
 import org.mockserver.model.HttpRequest;
 import org.mockserver.model.HttpResponse;
+import org.mockserver.model.LogEventRequestAndResponse;
 import org.mockserver.model.MediaType;
+import org.mockserver.model.ObjectWithJsonToString;
+import org.mockserver.model.RequestDefinition;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
@@ -17,13 +22,13 @@ import static org.mockserver.model.HttpResponse.response;
 
 public class MockServer extends SlimFixture {
 
-    private static ClientAndServer mock;
+    private final ClientAndServer mock;
 
     public MockServer(int port) {
         mock = startClientAndServer(port);
     }
 
-    public void setResponseForTo(String path, String body) {
+    public void setResponseBodyForTo(String path, String body) {
         mock.when(request().withPath(path)).respond(response().withBody(body));
     }
 
@@ -160,6 +165,41 @@ public class MockServer extends SlimFixture {
             }
         }
         return req;
+    }
+
+    public HashMap<Integer, Object> recordedRequests() {
+        return arrayOfJsonObjectsToMap(mock.retrieveRecordedRequests(null));
+    }
+
+    public HashMap<Integer, Object> recordedRequestsForPath(String path) {
+        return arrayOfJsonObjectsToMap(mock.retrieveRecordedRequests(request().withPath(path)));
+    }
+
+    public int numberOfRequestsForPath(String path) {
+        return mock.retrieveRecordedRequests(request().withPath(path)).length;
+    }
+
+    public HashMap<Integer, Object> recordedRequestsAndResponses() {
+        return arrayOfJsonObjectsToMap(mock.retrieveRecordedRequestsAndResponses(null));
+    }
+
+    public HashMap<Integer, Object> recordedRequestsAndResponsesForPath(String path) {
+        return arrayOfJsonObjectsToMap(mock.retrieveRecordedRequestsAndResponses(request().withPath(path)));
+    }
+
+    public HashMap<Integer, Object> arrayOfJsonObjectsToMap(ObjectWithJsonToString[] array) {
+        HashMap<Integer, Object> result = new HashMap<>();
+        int count = 0;
+        ObjectMapper m = new ObjectMapper();
+        try {
+            for (ObjectWithJsonToString obj : array) {
+                result.put(count, m.readValue(obj.toString(), HashMap.class));
+                count++;
+            }
+            return result;
+        } catch (Exception e) {
+            throw new SlimFixtureException(true, e.getMessage());
+        }
     }
 
 
