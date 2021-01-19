@@ -3,19 +3,26 @@ package nl.praegus.fitnesse.slim.fixtures.mockserver;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import nl.hsac.fitnesse.fixture.slim.SlimFixture;
 import nl.hsac.fitnesse.fixture.slim.SlimFixtureException;
+import org.mockserver.configuration.ConfigurationProperties;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.HttpForward;
+import org.mockserver.model.HttpOverrideForwardedRequest;
 import org.mockserver.model.HttpRequest;
 import org.mockserver.model.HttpResponse;
-import org.mockserver.model.LogEventRequestAndResponse;
 import org.mockserver.model.MediaType;
 import org.mockserver.model.ObjectWithJsonToString;
-import org.mockserver.model.RequestDefinition;
+import org.mockserver.model.SocketAddress;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
+import static org.mockserver.model.BinaryBody.binary;
 import static org.mockserver.model.HttpForward.forward;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
@@ -25,36 +32,75 @@ public class MockServer extends SlimFixture {
     private final ClientAndServer mock;
 
     public MockServer(int port) {
+        ConfigurationProperties.enableCORSForAllResponses(true);
         mock = startClientAndServer(port);
     }
 
     public void setResponseBodyForTo(String path, String body) {
-        mock.when(request().withPath(path)).respond(response().withBody(body));
+        mock.when(request().withPath(path)).respond(response().withBody(getResponseBodyFromFileOrLiteral(body)));
+    }
+
+    public void setResponseBodyForToWithStatus(String path, String body, int status) {
+        mock.when(request().withPath(path))
+                .respond(response()
+                        .withBody(getResponseBodyFromFileOrLiteral(body))
+                        .withStatusCode(status));
+    }
+
+    public void setBinaryResponseForTo(String path, String file) {
+        mock.when(request()
+                .withPath(path))
+                .respond(response()
+                        .withBody(binary(getBytes(file))));
     }
 
     public void setResponseForTo(Map<String, Object> requestMatching, Map<String, Object> responseDefinition) {
-        mock.when(httpRequestMatching(requestMatching)).respond(createResponse(responseDefinition));
+        mock.when(httpRequestMatching(requestMatching))
+                .respond(createResponse(responseDefinition));
     }
 
     public void forwardRequestsOnTo(String path, String target) {
         String host = target;
+        HttpForward.Scheme scheme = HttpForward.Scheme.HTTP;
         int port = 80;
+
+        if (target.split(":")[0].startsWith("https")) {
+            port = 443;
+            scheme = HttpForward.Scheme.HTTPS;
+        }
+
+        target = target.split(":")[1];
         if (target.contains(":")) {
             host = target.split(":")[0];
             port = Integer.parseInt(target.split(":")[1]);
         }
-        createForwardRule(path, host, port, HttpForward.Scheme.HTTP);
+        createForwardRule(path, host, port, scheme);
     }
 
-    public void forwardRequestsOnToHttps(String path, String target) {
+    public void forwardRequestsOnToWithPath(String path, String target, String fwPath) {
         String host = target;
-        int port = 443;
+        int port = 80;
+        SocketAddress.Scheme scheme = SocketAddress.Scheme.HTTP;
+
+        if (target.split(":")[0].startsWith("https")) {
+            port = 443;
+            scheme = SocketAddress.Scheme.HTTPS;
+        }
+
+        target = target.split(":")[1];
         if (target.contains(":")) {
             host = target.split(":")[0];
             port = Integer.parseInt(target.split(":")[1]);
         }
-        createForwardRule(path, host, port, HttpForward.Scheme.HTTPS);
+        createForwardRuleWithPath(path, host, port, scheme, fwPath);
+    }
 
+    private void createForwardRuleWithPath(String path, String host, int port, SocketAddress.Scheme scheme, String fwPath) {
+        mock.when(request().withPath(path))
+                .forward(HttpOverrideForwardedRequest.forwardOverriddenRequest(
+                        request()
+                                .withPath(fwPath)
+                                .withSocketAddress(host.split("://")[1], port, scheme)));
     }
 
     private void createForwardRule(String path, String host, int port, HttpForward.Scheme scheme) {
@@ -78,7 +124,7 @@ public class MockServer extends SlimFixture {
         for (String prop : responseProperties.keySet()) {
             switch (prop.toLowerCase()) {
                 case "body":
-                    resp = resp.withBody(responseProperties.get(prop).toString());
+                    resp = resp.withBody(getResponseBodyFromFileOrLiteral(responseProperties.get(prop).toString()));
                     break;
                 case "status":
                     resp = resp.withStatusCode(Integer.parseInt(responseProperties.get(prop).toString()));
@@ -200,6 +246,35 @@ public class MockServer extends SlimFixture {
         } catch (Exception e) {
             throw new SlimFixtureException(true, e.getMessage());
         }
+    }
+
+    protected String getResponseBodyFromFileOrLiteral(String responseFile) {
+        if (responseFile.startsWith("http://files") | responseFile.startsWith("files/")) {
+            String responseFilePath = getFilePathFromWikiUrl(responseFile);
+            try {
+                return readFile(responseFilePath, StandardCharsets.UTF_8);
+            } catch (IOException e) {
+                throw new SlimFixtureException(true, "Unable to get response file contents from: " + responseFile, e);
+            }
+        }
+        return responseFile;
+    }
+
+    protected byte[] getBytes(String responseFile) {
+        if (responseFile.startsWith("http://files") | responseFile.startsWith("files/")) {
+            String responseFilePath = getFilePathFromWikiUrl(responseFile);
+            try {
+                return Files.readAllBytes(Paths.get(responseFilePath));
+            } catch (IOException e) {
+                throw new SlimFixtureException(true, "Unable to get response file contents from: " + responseFile, e);
+            }
+        }
+        return new byte[]{};
+    }
+
+    protected static String readFile(String path, Charset encoding) throws IOException {
+        byte[] encoded = Files.readAllBytes(Paths.get(path));
+        return new String(encoded, encoding);
     }
 
 
