@@ -38,7 +38,7 @@ A fixture to easily interact with the /xas endpoint of Mendix web applications. 
 A set of helper methods for BrowserTest that make interacting with Mendix Apps easier.
 
 ### Praegus Browser Test
-A set of methods for BrowserTest with added functionality for loaders, blur after sending text, stop test on exceptions and improving browser resize.
+A set of methods for BrowserTest with added functionality for loaders, blur after sending text, stop test on exceptions and adding an attempt at browser resize when set browser size to maximum fails.
 
 ### TOTP fixture
 A fixture the generates Time-based One Time Password, just like Google Authenticator does. 
