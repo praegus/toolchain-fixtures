@@ -41,7 +41,7 @@ public class PausePopupDialog extends JDialog {
     private int value;
     private static Point center = null;
     private final JLabel label;
-    private static boolean keepOnTop = false;
+    private static boolean keepOnTop = true;
 
     private synchronized void setValue(int value) {
         this.value = value;
@@ -143,7 +143,7 @@ public class PausePopupDialog extends JDialog {
         });
         popupMenu.add(ctcMenuItem);
         //
-        JCheckBoxMenuItem kotMenuItem = new JCheckBoxMenuItem("keep on top");
+        JCheckBoxMenuItem kotMenuItem = new JCheckBoxMenuItem("Always on top");
         kotMenuItem.setSelected(keepOnTop);
         kotMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {

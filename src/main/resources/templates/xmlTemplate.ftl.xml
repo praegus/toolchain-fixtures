@@ -1,14 +1,22 @@
 <#function output item>
+    <!-- HASHMAPS -->
     <#if item?is_hash>
         <#assign obj = "">
         <#list item as k, v>
-            <#assign obj += '<${k}>' + output(v) + "</${k?split(\" \")?first}>">
+            <!--IF KEY STARTS WITH DOUBLE UNDERSCORE, DO NOT USE KEY AS CONTAINER-->
+            <#if k?starts_with("__")>
+                <#assign obj += output(v)>
+            <#else>
+                <#assign obj += '<${k}>' + output(v) + "</${k?split(\" \")?first}>">
+            </#if>
         </#list>
+    <!-- LISTS -->
     <#elseif item?is_sequence>
         <#assign obj = "">
         <#list item as v>
             <#assign obj += output(v)>
         </#list>
+    <!-- SINGLE VALUES -->
     <#else>
         <#assign obj = item>
     </#if>
