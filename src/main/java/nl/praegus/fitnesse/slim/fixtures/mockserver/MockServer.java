@@ -9,6 +9,7 @@ import org.mockserver.model.HttpForward;
 import org.mockserver.model.HttpOverrideForwardedRequest;
 import org.mockserver.model.HttpRequest;
 import org.mockserver.model.HttpResponse;
+import org.mockserver.model.LogEventRequestAndResponse;
 import org.mockserver.model.MediaType;
 import org.mockserver.model.ObjectWithJsonToString;
 import org.mockserver.model.SocketAddress;
@@ -18,7 +19,9 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
@@ -31,15 +34,34 @@ public class MockServer extends SlimFixture {
 
     private final ClientAndServer mock;
 
+    /**
+     * Initialize a mock server instance on a given port
+     *
+     * @param port The port number to use
+     */
     public MockServer(int port) {
         ConfigurationProperties.enableCORSForAllResponses(true);
         mock = startClientAndServer(port);
     }
 
+    /**
+     * Set the mock response body for any request on the given path
+     *
+     * @param path The path to set this response for (supports regular expressions)
+     * @param body The response body as a String
+     */
     public void setResponseBodyForTo(String path, String body) {
         mock.when(request().withPath(path)).respond(response().withBody(getResponseBodyFromFileOrLiteral(body)));
     }
 
+    /**
+     * Set a mock response body with a given status code for any request on the given path
+     * Usage: | set response body for | [path] | to | [body] | with status | [status] |
+     *
+     * @param path   The path to set this response for (supports regular expressions)
+     * @param body   The response body as a String
+     * @param status The status code to respond with
+     */
     public void setResponseBodyForToWithStatus(String path, String body, int status) {
         mock.when(request().withPath(path))
                 .respond(response()
@@ -47,6 +69,12 @@ public class MockServer extends SlimFixture {
                         .withStatusCode(status));
     }
 
+    /**
+     * Sets a binary file as the response for any request on the given path
+     *
+     * @param path The path to set this response for (supports regular expressions)
+     * @param file The file to respond with (Can be an absolute path, a path relative to /files or a wiki file path)
+     */
     public void setBinaryResponseForTo(String path, String file) {
         mock.when(request()
                 .withPath(path))
@@ -54,11 +82,26 @@ public class MockServer extends SlimFixture {
                         .withBody(binary(getBytes(file))));
     }
 
+    /**
+     * Sets a response defined in the response definition hashmap for any request that matches the rules defined in the
+     * request matching hashmap
+     * Usage: | set response for | [map: requestMatching] | to | [map: responseDefinition] |
+     *
+     * @param requestMatching    a map object containing request filter rules. Valid rules are: method, path, content-type,
+     *                           cookies, querystring, headers
+     * @param responseDefinition a map object containing the definition of the response. Valid fields are: body, status,
+     *                           headers, content-type, cookies
+     */
     public void setResponseForTo(Map<String, Object> requestMatching, Map<String, Object> responseDefinition) {
         mock.when(httpRequestMatching(requestMatching))
                 .respond(createResponse(responseDefinition));
     }
 
+    /**
+     * Forward any request on the given path to the target host/port
+     * @param path The path to forward requests for
+     * @param target The host/port to forward to (http(s)://host[:port])
+     */
     public void forwardRequestsOnTo(String path, String target) {
         String host = target;
         HttpForward.Scheme scheme = HttpForward.Scheme.HTTP;
@@ -77,6 +120,13 @@ public class MockServer extends SlimFixture {
         createForwardRule(path, host, port, scheme);
     }
 
+    /**
+     * Forward any request on the given path to the target host/port/path
+     * Usage: | forward requests on | [path] | to | [target] | with path | [fwPath] |
+     * @param path The path to forward requests for
+     * @param target The host/port to forward to (http(s)://host[:port])
+     * @param fwPath The path to forward to
+     */
     public void forwardRequestsOnToWithPath(String path, String target, String fwPath) {
         String host = target;
         int port = 80;
@@ -111,10 +161,16 @@ public class MockServer extends SlimFixture {
                         .withScheme(scheme));
     }
 
+    /**
+     * Opens the mockserver UI in the browser. Use only on local wiki test runs!
+     */
     public void openMockServerUi() {
         mock.openUI();
     }
 
+    /**
+     * Stop the server
+     */
     public void stopMockServer() {
         mock.stop();
     }
@@ -231,6 +287,18 @@ public class MockServer extends SlimFixture {
 
     public HashMap<Integer, Object> recordedRequestsAndResponsesForPath(String path) {
         return arrayOfJsonObjectsToMap(mock.retrieveRecordedRequestsAndResponses(request().withPath(path)));
+    }
+
+    public List<String> erroredRequests() {
+        List<String> result = new ArrayList<>();
+        LogEventRequestAndResponse[] requests = mock.retrieveRecordedRequestsAndResponses(null);
+        for (LogEventRequestAndResponse r : requests) {
+            if (r.getHttpResponse().getStatusCode() >= 400) {
+                HttpRequest req = (HttpRequest) r.getHttpRequest();
+                result.add(req.getPath() + " " + r.getHttpResponse().getStatusCode());
+            }
+        }
+        return result;
     }
 
     public HashMap<Integer, Object> arrayOfJsonObjectsToMap(ObjectWithJsonToString[] array) {
