@@ -112,10 +112,11 @@ public class MockServer extends SlimFixture {
             scheme = HttpForward.Scheme.HTTPS;
         }
 
-        host = target.split(":")[1];
+        host = target.split("://")[1];
 
-        if (target.split(":").length == 3) {
-            port = Integer.parseInt(target.split(":")[2]);
+        if (host.split(":").length == 2) {
+            port = Integer.parseInt(host.split(":")[1]);
+            host = host.split(":")[0];
         }
         createForwardRule(path, host, port, scheme);
     }
