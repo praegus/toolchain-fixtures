@@ -29,6 +29,7 @@ import static org.mockserver.model.BinaryBody.binary;
 import static org.mockserver.model.HttpForward.forward;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
+import static org.mockserver.model.SocketAddress.Scheme;
 
 public class MockServer extends SlimFixture {
 
@@ -108,23 +109,8 @@ public class MockServer extends SlimFixture {
      */
     public void forwardRequestsOnTo(String path, String target) {
         validatePath(path);
-
-        String host = target;
-        HttpForward.Scheme scheme = HttpForward.Scheme.HTTP;
-        int port = 80;
-
-        if (target.split(":")[0].startsWith("https")) {
-            port = 443;
-            scheme = HttpForward.Scheme.HTTPS;
-        }
-
-        host = target.split("://")[1];
-
-        if (host.split(":").length == 2) {
-            port = Integer.parseInt(host.split(":")[1]);
-            host = host.split(":")[0];
-        }
-        createForwardRule(path, host, port, scheme);
+        SocketAddress targetAddress = getTargetAddress(target);
+        createForwardRule(path, targetAddress.getHost(), targetAddress.getPort(), HttpForward.Scheme.valueOf(targetAddress.getScheme().name()));
     }
 
     /**
@@ -138,25 +124,30 @@ public class MockServer extends SlimFixture {
     public void forwardRequestsOnToWithPath(String path, String target, String fwPath) {
         validatePath(path);
         validatePath(fwPath);
-        String host = target;
-        int port = 80;
-        SocketAddress.Scheme scheme = SocketAddress.Scheme.HTTP;
-
-        if (target.split(":")[0].startsWith("https")) {
-            port = 443;
-            scheme = SocketAddress.Scheme.HTTPS;
-        }
-
-        host = target.split("://")[1];
-
-        if (host.split(":").length == 2) {
-            port = Integer.parseInt(host.split(":")[1]);
-            host = host.split(":")[0];
-        }
-        createForwardRuleWithPath(path, host, port, scheme, fwPath);
+        SocketAddress targetAddress = getTargetAddress(target);
+        createForwardRuleWithPath(path, targetAddress.getHost(), targetAddress.getPort(), targetAddress.getScheme(), fwPath);
     }
 
-    private void createForwardRuleWithPath(String path, String host, int port, SocketAddress.Scheme scheme, String fwPath) {
+    private SocketAddress getTargetAddress(String target) {
+        SocketAddress result = new SocketAddress();
+
+        if (target.split(":")[0].startsWith("https")) {
+            result = result.withScheme(Scheme.HTTPS).withPort(443);
+        } else {
+            result = result.withScheme(Scheme.HTTP).withPort(80);
+        }
+
+        String hostPort = target.split("://")[1];
+
+        if (hostPort.split(":").length == 2) {
+            result = result.withHost(hostPort.split(":")[0]).withPort(Integer.parseInt(hostPort.split(":")[1]));
+        } else {
+            result = result.withHost(hostPort);
+        }
+        return result;
+    }
+
+    private void createForwardRuleWithPath(String path, String host, int port, Scheme scheme, String fwPath) {
         mock.when(request().withPath(path))
                 .forward(HttpOverrideForwardedRequest.forwardOverriddenRequest(
                         request()
