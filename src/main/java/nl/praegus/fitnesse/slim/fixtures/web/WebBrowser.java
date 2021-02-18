@@ -175,8 +175,12 @@ public class WebBrowser extends BrowserTest<WebElement> {
     protected Throwable handleException(Method method, Object[] arguments, Throwable t) {
         Throwable result = super.handleException(method, arguments, t);
         if (dumpConsoleOnException) {
-            result = new SlimFixtureException(false, result.getMessage().substring(10, result.getMessage().length() - 2) +
-                    "<br /><b>Console Log:</b><br /><div style:\"font-size=0.8em;\">" + consoleLog() + "</div>", t);
+            result = new SlimFixtureException(false, 
+                    result.getMessage().substring(10, result.getMessage().length() - 2) +
+                    "<br /><b>Console Log:</b><br /><div style=\"font-size:0.8em; font-family: monospace;\">" +
+                    consoleLog() +
+                    "</div>",
+                    t);
         }
         if (abortOnException) {
             String msg = result.getMessage();
