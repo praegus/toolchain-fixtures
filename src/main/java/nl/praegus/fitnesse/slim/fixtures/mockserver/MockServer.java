@@ -51,6 +51,7 @@ public class MockServer extends SlimFixture {
      * @param body The response body as a String
      */
     public void setResponseBodyForTo(String path, String body) {
+        pathValidator(path);
         mock.when(request().withPath(path)).respond(response().withBody(getResponseBodyFromFileOrLiteral(body)));
     }
 
@@ -63,6 +64,7 @@ public class MockServer extends SlimFixture {
      * @param status The status code to respond with
      */
     public void setResponseBodyForToWithStatus(String path, String body, int status) {
+        pathValidator(path);
         mock.when(request().withPath(path))
                 .respond(response()
                         .withBody(getResponseBodyFromFileOrLiteral(body))
@@ -76,6 +78,7 @@ public class MockServer extends SlimFixture {
      * @param file The file to respond with (Can be an absolute path, a path relative to /files or a wiki file path)
      */
     public void setBinaryResponseForTo(String path, String file) {
+        pathValidator(path);
         mock.when(request()
                 .withPath(path))
                 .respond(response()
@@ -103,6 +106,8 @@ public class MockServer extends SlimFixture {
      * @param target The host/port to forward to (http(s)://host[:port])
      */
     public void forwardRequestsOnTo(String path, String target) {
+        pathValidator(path);
+
         String host = target;
         HttpForward.Scheme scheme = HttpForward.Scheme.HTTP;
         int port = 80;
@@ -112,10 +117,11 @@ public class MockServer extends SlimFixture {
             scheme = HttpForward.Scheme.HTTPS;
         }
 
-        target = target.split(":")[1];
-        if (target.contains(":")) {
-            host = target.split(":")[0];
-            port = Integer.parseInt(target.split(":")[1]);
+        host = target.split("://")[1];
+
+        if (host.split(":").length == 2) {
+            port = Integer.parseInt(host.split(":")[1]);
+            host = host.split(":")[0];
         }
         createForwardRule(path, host, port, scheme);
     }
@@ -128,6 +134,8 @@ public class MockServer extends SlimFixture {
      * @param fwPath The path to forward to
      */
     public void forwardRequestsOnToWithPath(String path, String target, String fwPath) {
+        pathValidator(path);
+        pathValidator(fwPath);
         String host = target;
         int port = 80;
         SocketAddress.Scheme scheme = SocketAddress.Scheme.HTTP;
@@ -137,10 +145,11 @@ public class MockServer extends SlimFixture {
             scheme = SocketAddress.Scheme.HTTPS;
         }
 
-        target = target.split(":")[1];
-        if (target.contains(":")) {
-            host = target.split(":")[0];
-            port = Integer.parseInt(target.split(":")[1]);
+        host = target.split("://")[1];
+
+        if (host.split(":").length == 2) {
+            port = Integer.parseInt(host.split(":")[1]);
+            host = host.split(":")[0];
         }
         createForwardRuleWithPath(path, host, port, scheme, fwPath);
     }
@@ -229,6 +238,7 @@ public class MockServer extends SlimFixture {
                     req = req.withMethod(rules.get(rule).toString());
                     break;
                 case "path":
+                    pathValidator(rules.get(rule).toString());
                     req = req.withPath(rules.get(rule).toString());
                     break;
                 case "content-type":
@@ -343,6 +353,12 @@ public class MockServer extends SlimFixture {
     protected static String readFile(String path, Charset encoding) throws IOException {
         byte[] encoded = Files.readAllBytes(Paths.get(path));
         return new String(encoded, encoding);
+    }
+
+    private void pathValidator(String path) {
+        if (!path.startsWith("/") || path.startsWith("//")){
+            throw new SlimFixtureException(false, "Invalide path input: " + path + ". Path should start with single /");
+        }
     }
 
 
