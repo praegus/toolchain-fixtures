@@ -4,7 +4,7 @@ import nl.hsac.fitnesse.fixture.slim.SlimFixtureException;
 import nl.hsac.fitnesse.fixture.slim.StopTestException;
 import nl.hsac.fitnesse.fixture.slim.web.BrowserTest;
 import nl.hsac.fitnesse.slim.interaction.ReflectionHelper;
-import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.logging.LogType;
@@ -12,6 +12,8 @@ import org.openqa.selenium.logging.LogType;
 import java.lang.reflect.Method;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -21,7 +23,6 @@ import java.util.TimeZone;
 
 public class WebBrowser extends BrowserTest<WebElement> {
     private final static Set<String> METHODS_NO_WAIT;
-
     static {
         METHODS_NO_WAIT = ReflectionHelper.validateMethodNames(BrowserTest.class,
                 "open", "takeScreenshot", "location", "back", "forward", "refresh", "alertText", "confirmAlert",
@@ -38,12 +39,14 @@ public class WebBrowser extends BrowserTest<WebElement> {
     }
 
     private int inputDelay = 0;
-    private String spinner;
+    private String progressIndicator;
     private boolean abortOnException;
     private boolean dumpConsoleOnException;
+    private boolean blurAfterSendingText = false;
 
     /**
      * Dump the browser's console log (if available) below any exception when it occurs. This may help debugging front-end issues
+     *
      * @param dump true to append the console log to the exception message. Defaults to false when not set.
      */
     public void dumpConsoleOnException(boolean dump) {
@@ -52,6 +55,7 @@ public class WebBrowser extends BrowserTest<WebElement> {
 
     /**
      * Abort the test on any exception.
+     *
      * @param abort true to convert any Exception to a StopTestException. Effectively aborting the test on the first timeout. Defaults to false when not set.
      */
     public void abortOnException(boolean abort) {
@@ -60,6 +64,7 @@ public class WebBrowser extends BrowserTest<WebElement> {
 
     /**
      * Get the currently configured input delay.
+     *
      * @return the current delay in milliseconds.
      */
     public int getInputDelay() {
@@ -68,6 +73,7 @@ public class WebBrowser extends BrowserTest<WebElement> {
 
     /**
      * Set the input delay.
+     *
      * @param inputDelay The desired delay in milliseconds. This will wait [inputDelay] milliseconds before each browser interaction or value extraction.
      *                   Effectively slowing your testscript.
      */
@@ -76,19 +82,39 @@ public class WebBrowser extends BrowserTest<WebElement> {
     }
 
     /**
-     * Returns the spinner locator currently set
+     * Returns the progress indicator locator currently set
+     *
      * @return The locator String
      */
-    public String getSpinnerLocator() {
-        return spinner;
+    public String getProgressIndicator() {
+        return progressIndicator;
     }
 
     /**
-     * Configure a spinner locator to wait for before any interaction/extraction
+     * Configure a progress indicator locator to wait for before any interaction/extraction
+     *
      * @param spinner The locator (heuristic/css=/xpath=/id=/name=/etc.) to wait for.
      */
-    public void setSpinnerLocator(String spinner) {
-        this.spinner = spinner;
+    public void setProgressIndicator(String spinner) {
+        this.progressIndicator = spinner;
+    }
+
+    /**
+     * Press tab after sending input
+     *
+     * @param blurAfterSendingText true to send a tab keypress after sendValue. Defaults to false when not set.
+     */
+    public void blurAfterSendingText(boolean blurAfterSendingText) {
+        this.blurAfterSendingText = blurAfterSendingText;
+    }
+
+    /**
+     * Get the current setting.
+     *
+     * @return true if set, false otherwise
+     */
+    public boolean blurAfterSendingText() {
+        return blurAfterSendingText;
     }
 
     public WebBrowser() {
@@ -113,11 +139,11 @@ public class WebBrowser extends BrowserTest<WebElement> {
                 if (inputDelay > 0) {
                     waitMilliseconds(inputDelay);
                 }
-                if (spinner != null) {
-                    SearchContext currentCtx = getSeleniumHelper().getCurrentContext();
+                if (progressIndicator != null && progressIndicator.trim().length() > 0) {
+                    List<String> fullPath = new ArrayList<>(getCurrentSearchContextPath());
                     clearSearchContext();
-                    waitUntil(webDriver -> isNotVisibleOnPage(spinner));
-                    getSeleniumHelper().setCurrentContext(currentCtx);
+                    waitUntil(webDriver -> isNotVisibleOnPage(progressIndicator));
+                    refreshSearchContext(fullPath, Math.min(fullPath.size(), minStaleContextRefreshCount));
                 }
             } catch (SlimFixtureException e) {
                 String msg = e.getMessage();
@@ -126,6 +152,21 @@ public class WebBrowser extends BrowserTest<WebElement> {
                     msg = msg.replaceAll("Timed-out waiting ", "Timed out waiting for spinner to disappear ");
                 }
                 throw new SlimFixtureException(false, msg);
+            }
+        }
+    }
+
+    @Override
+    public void setBrowserSizeToMaximum() {
+        try {
+            super.setBrowserSizeToMaximum();
+        } catch (WebDriverException e) {
+            try {
+                setBrowserHeight(900);
+                setBrowserWidth(1800);
+                System.out.println("Tried to maximize a browser that didn't allow that, tried setting 1800x900 now");
+            } catch (WebDriverException f) {
+                System.out.println("Resizing not allowed, mobile device or headless browser?");
             }
         }
     }
@@ -147,11 +188,34 @@ public class WebBrowser extends BrowserTest<WebElement> {
         return result;
     }
 
+    @Override
+    protected void sendValue(WebElement element, String value) {
+        super.sendValue(element, value);
+        if (blurAfterSendingText) {
+            pressTab();
+        }
+    }
+
+    /**
+     * Get the vlue of a CSS property on an element
+     *
+     * @param property The property to return a value for
+     * @param place    The element the property is on
+     * @return The property value
+     */
     public String valueOfCssPropertyOn(String property, String place) {
         WebElement element = getElement(place);
         return element.getCssValue(property);
     }
 
+    /**
+     * Get the vlue of a CSS property on an element
+     *
+     * @param property  The property to return a value for
+     * @param place     The element the property is on
+     * @param container the container element to limit the serach to
+     * @return The property value
+     */
     public String valueOfCssPropertyOnIn(String property, String place, String container) {
         WebElement element = getElement(place, container);
         return element.getCssValue(property);
@@ -159,6 +223,7 @@ public class WebBrowser extends BrowserTest<WebElement> {
 
     /**
      * Get and clear the browser's console log
+     *
      * @return the current console log, formatted as [Time] [LEVEL] [Message]. Every log on a new line.
      */
     public String consoleLog() {
@@ -174,6 +239,7 @@ public class WebBrowser extends BrowserTest<WebElement> {
 
     /**
      * Make sure no errors have occured in the browser's console
+     *
      * @return true if the console log holds no messages with level SEVERE
      */
     public boolean noErrorsInBrowserConsole() {
@@ -187,6 +253,7 @@ public class WebBrowser extends BrowserTest<WebElement> {
 
     /**
      * Make sure no warnings or errors have occured in the browser's console
+     *
      * @return true if the console log holds no messages with level SEVERE or WARNING
      */
     public boolean noWarningsOrErrorsInBrowserConsole() {

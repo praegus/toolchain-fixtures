@@ -13,8 +13,11 @@ import java.lang.reflect.Method;
 
 /**
  * Custom Praegus fixture class
+ * DEPRECATED: Use nl.praegus.fitnesse.slim.fixtures.web.WebBrowser instead!
+ * Thiss class is awaiting removal.
  */
 
+@Deprecated
 public class PraegusBrowserTest<T extends WebElement> extends BrowserTest<T> {
 
     private boolean blurAfterSendingText = false;
