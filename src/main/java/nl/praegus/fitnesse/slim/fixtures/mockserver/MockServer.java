@@ -102,6 +102,26 @@ public class MockServer extends SlimFixture {
     }
 
     /**
+     * forwards a request to the target host/port and path for any request that matches the rules defined in the
+     * request matching hashmap
+     * Usage: | set forward for | [map: requestMatching] | to | target | with path | fwpath |
+     *
+     * @param requestMatching    a map object containing request filter rules. Valid rules are: method, path, content-type,
+     *                           cookies, querystring, headers, body
+     * @param target             The host/port to forward to (http(s)://host[:port])
+     * @param fwPath             The path to forward to
+     */
+    public void setForwardForToWithPath(Map<String, Object> requestMatching, String target, String fwPath) {
+        validatePath(fwPath);
+        SocketAddress targetAddress = getTargetAddress(target);
+        mock.when(httpRequestMatching(requestMatching))
+                .forward(HttpOverrideForwardedRequest.forwardOverriddenRequest(
+                    request()
+                        .withPath(fwPath)
+                        .withSocketAddress(targetAddress.getHost(), targetAddress.getPort(), targetAddress.getScheme())));
+    }
+
+    /**
      * Forward any request on the given path to the target host/port
      *
      * @param path   The path to forward requests for
