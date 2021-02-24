@@ -9,9 +9,11 @@ import org.mockserver.model.HttpForward;
 import org.mockserver.model.HttpOverrideForwardedRequest;
 import org.mockserver.model.HttpRequest;
 import org.mockserver.model.HttpResponse;
+import org.mockserver.model.JsonPathBody;
 import org.mockserver.model.LogEventRequestAndResponse;
 import org.mockserver.model.MediaType;
 import org.mockserver.model.ObjectWithJsonToString;
+import org.mockserver.model.RegexBody;
 import org.mockserver.model.SocketAddress;
 
 import java.io.IOException;
@@ -92,7 +94,7 @@ public class MockServer extends SlimFixture {
      * Usage: | set response for | [map: requestMatching] | to | [map: responseDefinition] |
      *
      * @param requestMatching    a map object containing request filter rules. Valid rules are: method, path, content-type,
-     *                           cookies, querystring, headers
+     *                           cookies, querystring, headers, body
      * @param responseDefinition a map object containing the definition of the response. Valid fields are: body, status,
      *                           headers, content-type, cookies
      */
@@ -218,7 +220,7 @@ public class MockServer extends SlimFixture {
     }
 
     /**
-     * * Support method, path, cookie, querystring, content type, header
+     * Support method, path, cookie, querystring, content type, header, body
      *
      * @param rules
      * @return
@@ -263,6 +265,13 @@ public class MockServer extends SlimFixture {
                     }
                     for (Map.Entry header : ((Map<?, ?>) rules.get(rule)).entrySet()) {
                         req = req.withHeader(header.getKey().toString(), header.getValue().toString());
+                    }
+                    break;
+                case "body":
+                    if (rules.get(rule).toString().matches("^\\$.*$")) {
+                        req = req.withBody(new JsonPathBody(rules.get(rule).toString()));
+                    } else {
+                        req = req.withBody(new RegexBody(rules.get(rule).toString()));
                     }
                     break;
                 default:
