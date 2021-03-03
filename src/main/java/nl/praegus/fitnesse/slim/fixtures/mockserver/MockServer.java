@@ -113,6 +113,7 @@ public class MockServer extends SlimFixture {
      */
     public void setForwardForToWithPath(Map<String, Object> requestMatching, String target, String fwPath) {
         validatePath(fwPath);
+        validateTarget(target);
         SocketAddress targetAddress = getTargetAddress(target);
         mock.when(httpRequestMatching(requestMatching))
                 .forward(HttpOverrideForwardedRequest.forwardOverriddenRequest(
@@ -129,6 +130,7 @@ public class MockServer extends SlimFixture {
      */
     public void forwardRequestsOnTo(String path, String target) {
         validatePath(path);
+        validateTarget(target);
         SocketAddress targetAddress = getTargetAddress(target);
         createForwardRule(path, targetAddress.getHost(), targetAddress.getPort(), HttpForward.Scheme.valueOf(targetAddress.getScheme().name()));
     }
@@ -144,6 +146,7 @@ public class MockServer extends SlimFixture {
     public void forwardRequestsOnToWithPath(String path, String target, String fwPath) {
         validatePath(path);
         validatePath(fwPath);
+        validateTarget(target);
         SocketAddress targetAddress = getTargetAddress(target);
         createForwardRuleWithPath(path, targetAddress.getHost(), targetAddress.getPort(), targetAddress.getScheme(), fwPath);
     }
@@ -297,10 +300,12 @@ public class MockServer extends SlimFixture {
     }
 
     public HashMap<Integer, Object> recordedRequestsForPath(String path) {
+        validatePath(path);
         return arrayOfJsonObjectsToMap(mock.retrieveRecordedRequests(request().withPath(path)));
     }
 
     public int numberOfRequestsForPath(String path) {
+        validatePath(path);
         return mock.retrieveRecordedRequests(request().withPath(path)).length;
     }
 
@@ -309,6 +314,7 @@ public class MockServer extends SlimFixture {
     }
 
     public HashMap<Integer, Object> recordedRequestsAndResponsesForPath(String path) {
+        validatePath(path);
         return arrayOfJsonObjectsToMap(mock.retrieveRecordedRequestsAndResponses(request().withPath(path)));
     }
 
@@ -376,5 +382,10 @@ public class MockServer extends SlimFixture {
         }
     }
 
+    private void validateTarget(String target) {
+        if (!target.toLowerCase().matches("https?:\\/\\/.*(:[0-9]+)?")) {
+            throw new SlimFixtureException(false, "Invalid target input: " + target + ". Target should have the following format: http(s)://host[:port]");
+        }
+    }
 
 }
