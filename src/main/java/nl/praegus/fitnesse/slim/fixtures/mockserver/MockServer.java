@@ -15,6 +15,7 @@ import org.mockserver.model.MediaType;
 import org.mockserver.model.ObjectWithJsonToString;
 import org.mockserver.model.RegexBody;
 import org.mockserver.model.SocketAddress;
+import org.mockserver.model.XPathBody;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -268,10 +269,18 @@ public class MockServer extends SlimFixture {
                     }
                     break;
                 case "body":
-                    if (rules.get(rule).toString().matches("^\\$.*$")) {
-                        req = req.withBody(new JsonPathBody(rules.get(rule).toString()));
-                    } else {
-                        req = req.withBody(new RegexBody(rules.get(rule).toString()));
+                    switch (rules.get(rule).toString().split("=")[0]){
+                        case "jsonpath":
+                            req = req.withBody(new JsonPathBody(rules.get(rule).toString().split("=",2)[1]));
+                            break;
+                        case "xpath":
+                            req = req.withBody(new XPathBody(rules.get(rule).toString().split("=",2)[1]));
+                            break;
+                        case "regex":
+                            req = req.withBody(new RegexBody(rules.get(rule).toString().split("=",2)[1]));
+                            break;
+                        default:
+                            throw new SlimFixtureException("Unknown body filter: " + rules.get(rule).toString() + ". jsonpath= , xpath= and regex= is supported.");
                     }
                     break;
                 default:
