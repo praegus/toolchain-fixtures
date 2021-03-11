@@ -9,10 +9,13 @@ import org.mockserver.model.HttpForward;
 import org.mockserver.model.HttpOverrideForwardedRequest;
 import org.mockserver.model.HttpRequest;
 import org.mockserver.model.HttpResponse;
+import org.mockserver.model.JsonPathBody;
 import org.mockserver.model.LogEventRequestAndResponse;
 import org.mockserver.model.MediaType;
 import org.mockserver.model.ObjectWithJsonToString;
+import org.mockserver.model.RegexBody;
 import org.mockserver.model.SocketAddress;
+import org.mockserver.model.XPathBody;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -92,7 +95,7 @@ public class MockServer extends SlimFixture {
      * Usage: | set response for | [map: requestMatching] | to | [map: responseDefinition] |
      *
      * @param requestMatching    a map object containing request filter rules. Valid rules are: method, path, content-type,
-     *                           cookies, querystring, headers
+     *                           cookies, querystring, headers, body
      * @param responseDefinition a map object containing the definition of the response. Valid fields are: body, status,
      *                           headers, content-type, cookies
      */
@@ -280,6 +283,21 @@ public class MockServer extends SlimFixture {
                     }
                     for (Map.Entry header : ((Map<?, ?>) rules.get(rule)).entrySet()) {
                         req = req.withHeader(header.getKey().toString(), header.getValue().toString());
+                    }
+                    break;
+                case "body":
+                    switch (rules.get(rule).toString().split("=")[0]){
+                        case "jsonpath":
+                            req = req.withBody(new JsonPathBody(rules.get(rule).toString().split("=",2)[1]));
+                            break;
+                        case "xpath":
+                            req = req.withBody(new XPathBody(rules.get(rule).toString().split("=",2)[1]));
+                            break;
+                        case "regex":
+                            req = req.withBody(new RegexBody(rules.get(rule).toString().split("=",2)[1]));
+                            break;
+                        default:
+                            throw new SlimFixtureException("Unknown body filter: " + rules.get(rule).toString() + ". jsonpath= , xpath= and regex= is supported.");
                     }
                     break;
                 default:
