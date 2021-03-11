@@ -104,21 +104,21 @@ public class MockServer extends SlimFixture {
     /**
      * forwards a request to the target host/port and path for any request that matches the rules defined in the
      * request matching hashmap
-     * Usage: | set forward for | [map: requestMatching] | to | target | with path | fwpath |
+     * Usage: | forward requests matching | [map: requestMatching] | to | [target] | with path | [targetPath] |
      *
      * @param requestMatching    a map object containing request filter rules. Valid rules are: method, path, content-type,
      *                           cookies, querystring, headers, body
      * @param target             The host/port to forward to (http(s)://host[:port])
-     * @param fwPath             The path to forward to
+     * @param targetPath         The path to forward to
      */
-    public void setForwardForToWithPath(Map<String, Object> requestMatching, String target, String fwPath) {
-        validatePath(fwPath);
+    public void forwardRequestsMatchingToWithPath(Map<String, Object> requestMatching, String target, String targetPath) {
+        validatePath(targetPath);
         validateTarget(target);
         SocketAddress targetAddress = getTargetAddress(target);
         mock.when(httpRequestMatching(requestMatching))
                 .forward(HttpOverrideForwardedRequest.forwardOverriddenRequest(
                     request()
-                        .withPath(fwPath)
+                        .withPath(targetPath)
                         .withSocketAddress(targetAddress.getHost(), targetAddress.getPort(), targetAddress.getScheme())));
     }
 
@@ -132,7 +132,11 @@ public class MockServer extends SlimFixture {
         validatePath(path);
         validateTarget(target);
         SocketAddress targetAddress = getTargetAddress(target);
-        createForwardRule(path, targetAddress.getHost(), targetAddress.getPort(), HttpForward.Scheme.valueOf(targetAddress.getScheme().name()));
+        mock.when(request().withPath(path))
+                .forward(forward()
+                        .withHost(targetAddress.getHost())
+                        .withPort(targetAddress.getPort())
+                        .withScheme(HttpForward.Scheme.valueOf(targetAddress.getScheme().name())));
     }
 
     /**
@@ -148,7 +152,16 @@ public class MockServer extends SlimFixture {
         validatePath(fwPath);
         validateTarget(target);
         SocketAddress targetAddress = getTargetAddress(target);
-        createForwardRuleWithPath(path, targetAddress.getHost(), targetAddress.getPort(), targetAddress.getScheme(), fwPath);
+        mock.when(request().withPath(path))
+                .forward(HttpOverrideForwardedRequest.forwardOverriddenRequest(
+                        request()
+                                .withPath(fwPath)
+                                .withSocketAddress(
+                                        targetAddress.getHost().split("://")[1],
+                                        targetAddress.getPort(),
+                                        targetAddress.getScheme()
+                                )
+                ));
     }
 
     private SocketAddress getTargetAddress(String target) {
@@ -168,22 +181,6 @@ public class MockServer extends SlimFixture {
             result = result.withHost(hostPort);
         }
         return result;
-    }
-
-    private void createForwardRuleWithPath(String path, String host, int port, Scheme scheme, String fwPath) {
-        mock.when(request().withPath(path))
-                .forward(HttpOverrideForwardedRequest.forwardOverriddenRequest(
-                        request()
-                                .withPath(fwPath)
-                                .withSocketAddress(host.split("://")[1], port, scheme)));
-    }
-
-    private void createForwardRule(String path, String host, int port, HttpForward.Scheme scheme) {
-        mock.when(request().withPath(path))
-                .forward(forward()
-                        .withHost(host)
-                        .withPort(port)
-                        .withScheme(scheme));
     }
 
     /**
@@ -212,7 +209,7 @@ public class MockServer extends SlimFixture {
                     break;
                 case "headers":
                     if (!(responseProperties.get(prop) instanceof Map)) {
-                        throw new SlimFixtureException("Headers to return should be defined as a map containing key/value pairs.");
+                        throw new SlimFixtureException(false, "Headers to return should be defined as a map containing key/value pairs.");
                     }
                     for (Map.Entry header : ((Map<?, ?>) responseProperties.get(prop)).entrySet()) {
                         resp = resp.withHeader(header.getKey().toString(), header.getValue().toString());
@@ -221,13 +218,13 @@ public class MockServer extends SlimFixture {
                 case "content-type":
                     String[] contentType = responseProperties.get(prop).toString().split("/");
                     if (contentType.length < 2) {
-                        throw new SlimFixtureException("Content-Type should be defined as type/subtype. E.g. application/json");
+                        throw new SlimFixtureException(false, "Content-Type should be defined as type/subtype. E.g. application/json");
                     }
                     resp = resp.withContentType(new MediaType(contentType[0], contentType[1]));
                     break;
                 case "cookies":
                     if (!(responseProperties.get(prop) instanceof Map)) {
-                        throw new SlimFixtureException("Cookies to return should be defined as a map containing key/value pairs.");
+                        throw new SlimFixtureException(false, "Cookies to return should be defined as a map containing key/value pairs.");
                     }
                     for (Map.Entry cookie : ((Map<?, ?>) responseProperties.get(prop)).entrySet()) {
                         resp = resp.withCookie(cookie.getKey().toString(), cookie.getValue().toString());
@@ -242,9 +239,6 @@ public class MockServer extends SlimFixture {
 
     /**
      * * Support method, path, cookie, querystring, content type, header
-     *
-     * @param rules
-     * @return
      */
     private HttpRequest httpRequestMatching(Map<String, Object> rules) {
         HttpRequest req = request();
@@ -260,13 +254,13 @@ public class MockServer extends SlimFixture {
                 case "content-type":
                     String[] contentType = rules.get(rule).toString().split("/");
                     if (contentType.length < 2) {
-                        throw new SlimFixtureException("Content-Type should be defined as type/subtype. E.g. application/json");
+                        throw new SlimFixtureException(false, "Content-Type should be defined as type/subtype. E.g. application/json");
                     }
                     req = req.withContentType(new MediaType(contentType[0], contentType[1]));
                     break;
                 case "cookies":
                     if (!(rules.get(rule) instanceof Map)) {
-                        throw new SlimFixtureException("Cookies to filter requests on should be defined as a map containing key/value pairs.");
+                        throw new SlimFixtureException(false, "Cookies to filter requests on should be defined as a map containing key/value pairs.");
                     }
                     for (Map.Entry cookie : ((Map<?, ?>) rules.get(rule)).entrySet()) {
                         req = req.withCookie(cookie.getKey().toString(), cookie.getValue().toString());
@@ -274,7 +268,7 @@ public class MockServer extends SlimFixture {
                     break;
                 case "querystring":
                     if (!(rules.get(rule) instanceof Map)) {
-                        throw new SlimFixtureException("QueryString parameters to filter requests on should be defined as a map containing key/value pairs.");
+                        throw new SlimFixtureException(false, "QueryString parameters to filter requests on should be defined as a map containing key/value pairs.");
                     }
                     for (Map.Entry param : ((Map<?, ?>) rules.get(rule)).entrySet()) {
                         req = req.withQueryStringParameter(param.getKey().toString(), param.getValue().toString());
@@ -282,7 +276,7 @@ public class MockServer extends SlimFixture {
                     break;
                 case "headers":
                     if (!(rules.get(rule) instanceof Map)) {
-                        throw new SlimFixtureException("Headers to filter requests on should be defined as a map containing key/value pairs.");
+                        throw new SlimFixtureException(false, "Headers to filter requests on should be defined as a map containing key/value pairs.");
                     }
                     for (Map.Entry header : ((Map<?, ?>) rules.get(rule)).entrySet()) {
                         req = req.withHeader(header.getKey().toString(), header.getValue().toString());
@@ -383,7 +377,7 @@ public class MockServer extends SlimFixture {
     }
 
     private void validateTarget(String target) {
-        if (!target.toLowerCase().matches("https?:\\/\\/.*(:[0-9]+)?")) {
+        if (!target.toLowerCase().matches("https?://.*(:[0-9]+)?")) {
             throw new SlimFixtureException(false, "Invalid target input: " + target + ". Target should have the following format: http(s)://host[:port]");
         }
     }
