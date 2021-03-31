@@ -234,7 +234,7 @@ public class MockServer extends SlimFixture {
                     }
                     break;
                 default:
-                    throw new SlimFixtureException("Unknown reponse property: " + prop);
+                    throw new SlimFixtureException("Unknown response property: " + prop);
             }
         }
         return resp;
@@ -307,29 +307,53 @@ public class MockServer extends SlimFixture {
         return req;
     }
 
+    /**
+     * Retrieve all recorded requests from the mockserver in a map.
+     */
     public HashMap<Integer, Object> recordedRequests() {
         return arrayOfJsonObjectsToMap(mock.retrieveRecordedRequests(null));
     }
 
+    /**
+     * Retrieve recorded requests for a specific path from the mockserver in a map.
+     *
+     * @param path   The path for which to retrieve the recorded requests for
+     */
     public HashMap<Integer, Object> recordedRequestsForPath(String path) {
         validatePath(path);
         return arrayOfJsonObjectsToMap(mock.retrieveRecordedRequests(request().withPath(path)));
     }
 
+    /**
+     * Retrieve the number of recorded requests for a specific path from the mockserver.
+     *
+     * @param path   The path for which to retrieve the number of recorded requests for
+     */
     public int numberOfRequestsForPath(String path) {
         validatePath(path);
         return mock.retrieveRecordedRequests(request().withPath(path)).length;
     }
 
+    /**
+     * Retrieve all recorded requests and responses from the mockserver in a map.
+     */
     public HashMap<Integer, Object> recordedRequestsAndResponses() {
         return arrayOfJsonObjectsToMap(mock.retrieveRecordedRequestsAndResponses(null));
     }
 
+    /**
+     * Retrieve recorded requests and responses for a specific path from the mockserver in a map.
+     *
+     * @param path   The path for which to retrieve the recorded requests and responses for
+     */
     public HashMap<Integer, Object> recordedRequestsAndResponsesForPath(String path) {
         validatePath(path);
         return arrayOfJsonObjectsToMap(mock.retrieveRecordedRequestsAndResponses(request().withPath(path)));
     }
 
+    /**
+     * Retrieve request endpoints that returned an error status code (greater or equal to status code 400).
+     */
     public List<String> erroredRequests() {
         List<String> result = new ArrayList<>();
         LogEventRequestAndResponse[] requests = mock.retrieveRecordedRequestsAndResponses(null);
