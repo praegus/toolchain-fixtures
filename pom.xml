@@ -252,6 +252,12 @@
             <version>5.11.2</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.microsoft.playwright</groupId>
+            <artifactId>playwright</artifactId>
+            <version>1.10.0</version>
+        </dependency>
+
         <!-- for unittest -->
         <dependency>
             <groupId>org.assertj</groupId>
