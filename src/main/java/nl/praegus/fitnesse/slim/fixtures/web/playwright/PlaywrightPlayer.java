@@ -1,34 +1,26 @@
 package nl.praegus.fitnesse.slim.fixtures.web.playwright;
 
-import com.microsoft.playwright.Browser;
-import com.microsoft.playwright.BrowserContext;
-import com.microsoft.playwright.Download;
-import com.microsoft.playwright.Page;
-import com.microsoft.playwright.Playwright;
-import com.microsoft.playwright.PlaywrightException;
+import com.microsoft.playwright.*;
+import nl.hsac.fitnesse.fixture.slim.FileFixture;
 import nl.hsac.fitnesse.fixture.slim.SlimFixture;
 import nl.hsac.fitnesse.fixture.slim.SlimFixtureException;
-import nl.hsac.fitnesse.fixture.util.FileUtil;
 import nl.praegus.fitnesse.slim.fixtures.web.playwright.environment.PageObjects;
 
 import java.io.File;
 import java.lang.reflect.Method;
 
-import static com.microsoft.playwright.Page.ClickOptions;
-import static com.microsoft.playwright.Page.DblclickOptions;
-import static com.microsoft.playwright.Page.FillOptions;
 import static com.microsoft.playwright.Page.ScreenshotOptions;
 
 public class PlaywrightPlayer extends SlimFixture {
     private final PageObjects pageObjects = PageObjects.getInstance();
     private final Playwright playwright = Playwright.create();
     private final File screenshotFolder = new File(getEnvironment().getFitNesseFilesSectionDir(), "screenshots");
-    private final File pageSourceFolder = new File(getEnvironment().getFitNesseFilesSectionDir(), "pagesources");
+    private final String pageSourceFolder = getEnvironment().getFitNesseFilesSectionDir() + "/pagesource/";
     private final File downloadFolder = new File(getEnvironment().getFitNesseFilesSectionDir(), "downloads");
     private final BrowserContext ctx;
     private Browser browser;
     private Page currentPage;
-    private int timeoutInSeconds = 10;
+    private final FileFixture fileFixture = new FileFixture();
 
     public PlaywrightPlayer(String browserName) {
         startBrowser(browserName);
@@ -59,23 +51,40 @@ public class PlaywrightPlayer extends SlimFixture {
         }
     }
 
+    public void timeoutInSeconds(Integer timeoutInSeconds) {
+        currentPage.setDefaultTimeout(toMilliSeconds(timeoutInSeconds));
+    }
+
+    public void navigationTimeoutInSeconds(Integer timeoutInSeconds) {
+        currentPage.setDefaultNavigationTimeout(toMilliSeconds(timeoutInSeconds));
+    }
+
+    public void navigationTimeout(Integer timeoutInSeconds) {
+        currentPage.setDefaultNavigationTimeout(toMilliSeconds(timeoutInSeconds));
+    }
+
     public void navigateTo(String url) {
         currentPage.navigate(url);
     }
 
+    public void waitForNavigationAfterClicking(String pageObject) {
+        currentPage.waitForNavigation(() -> click(pageObject));
+    }
+
+    public void waitForSelector(String pageObject) {
+        currentPage.waitForSelector(getSelector(pageObject));
+    }
+
     public void click(String pageObject) {
-        ClickOptions cOpts = new ClickOptions().setTimeout(timeoutInSeconds * 1000);
-        currentPage.click(getSelector(pageObject), cOpts);
+        currentPage.click(getSelector(pageObject));
     }
 
     public void doubleClick(String pageObject) {
-        DblclickOptions cOpts = new DblclickOptions().setTimeout(timeoutInSeconds * 1000);
-        currentPage.dblclick(getSelector(pageObject), cOpts);
+        currentPage.dblclick(getSelector(pageObject));
     }
 
     public void enterAs(String value, String pageObject) {
-        FillOptions fOpts = new FillOptions().setTimeout(timeoutInSeconds * 1000);
-        currentPage.fill(getSelector(pageObject), value, fOpts);
+        currentPage.fill(getSelector(pageObject), value);
     }
 
     public void press(String keyOrChord) {
@@ -86,15 +95,20 @@ public class PlaywrightPlayer extends SlimFixture {
         String selector = getSelector(pageObject);
         String tagName = currentPage.evalOnSelector(selector, "e => e.tagName").toString();
         Object result;
-        if ("input".equals(tagName.toLowerCase()) ||
-                "button".equals(tagName.toLowerCase()) ||
-                "option".equals(tagName.toLowerCase()) ||
-                "select".equals(tagName.toLowerCase())) {
+        if ("input".equalsIgnoreCase(tagName)
+                || "button".equalsIgnoreCase(tagName)
+                || "option".equalsIgnoreCase(tagName)
+                || "select".equalsIgnoreCase(tagName)) {
             result = currentPage.evalOnSelector(selector, "e => e.value");
         } else {
             result = currentPage.innerText(selector);
         }
         return result.toString();
+    }
+
+    public String textValueOf(String pageObject) {
+        String selector = getSelector(pageObject);
+        return currentPage.textContent(selector);
     }
 
     public String takeScreenshot(String baseName) {
@@ -107,9 +121,8 @@ public class PlaywrightPlayer extends SlimFixture {
 
     public void uploadFileFor(String file, String pageObject) {
         String filePath = getEnvironment().getFilePathFromWikiUrl(file);
-        currentPage.onFileChooser(fileChooser -> {
-            fileChooser.setFiles(new File(filePath).toPath());
-        });
+        currentPage.onFileChooser(fileChooser ->
+                fileChooser.setFiles(new File(filePath).toPath()));
         click(pageObject);
     }
 
@@ -128,9 +141,7 @@ public class PlaywrightPlayer extends SlimFixture {
     }
 
     public String savePageSource(String baseName) {
-        File pageSource = new File(pageSourceFolder, baseName + ".html");
-        FileUtil.writeFile(pageSource.getAbsolutePath(), currentPage.content());
-        return String.format("<a href=\"%1s\" target=\"_blank\">%2s</a>", getWikiUrl(pageSource.getAbsolutePath()), pageSource.getName());
+        return fileFixture.createContaining(pageSourceFolder + baseName + ".html", currentPage.content());
     }
 
     public void switchToNextTab() {
@@ -163,10 +174,6 @@ public class PlaywrightPlayer extends SlimFixture {
         browser.close();
     }
 
-    public void timeoutInSeconds(int timeout) {
-        this.timeoutInSeconds = timeout;
-    }
-
     private String getSelector(String pageObject) {
         try {
             String pageObjectName = pageObject.split("\\.")[0];
@@ -182,6 +189,10 @@ public class PlaywrightPlayer extends SlimFixture {
         } catch (ArrayIndexOutOfBoundsException e) {
             return pageObject;
         }
+    }
+
+    private Integer toMilliSeconds(Integer timeoutInSeconds){
+        return timeoutInSeconds * 1000;
     }
 
     @Override
