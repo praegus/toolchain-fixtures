@@ -4,8 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PageObjects {
-    private final static PageObjects INSTANCE = new PageObjects();
+    private static final PageObjects INSTANCE = new PageObjects();
     private final Map<String, Map<String,Object>> pageObjects = new HashMap<>();
+
     /**
      * @return singleton instance.
      */

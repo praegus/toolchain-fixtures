@@ -13,7 +13,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <fitnesse.version>20201213</fitnesse.version>
-        <hsac.version>4.23.1</hsac.version>
+        <hsac.version>4.24.1</hsac.version>
         <google.api.version>1.30.7</google.api.version>
     </properties>
 
@@ -337,37 +337,37 @@
             </plugin>
 
             <!-- Aggregate JavaDoc for use with autoCompleteResponder -->
-            <plugin>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <extensions>true</extensions>
-                <version>3.2.0</version>
-                <executions>
-                    <execution>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>javadoc</goal>
-                        </goals>
-                    </execution>
-                </executions>
+<!--            <plugin>-->
+<!--                <artifactId>maven-javadoc-plugin</artifactId>-->
+<!--                <extensions>true</extensions>-->
+<!--                <version>3.2.0</version>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <phase>generate-resources</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>javadoc</goal>-->
+<!--                        </goals>-->
+<!--                    </execution>-->
+<!--                </executions>-->
 
-                <configuration>
-                    <doclet>nl.praegus.doclets.FixtureDocGenerator</doclet>
-                    <docletArtifact>
-                        <groupId>nl.praegus</groupId>
-                        <artifactId>fixture-doc-generator</artifactId>
-                        <version>1.1</version>
-                    </docletArtifact>
+<!--                <configuration>-->
+<!--                    <doclet>nl.praegus.doclets.FixtureDocGenerator</doclet>-->
+<!--                    <docletArtifact>-->
+<!--                        <groupId>nl.praegus</groupId>-->
+<!--                        <artifactId>fixture-doc-generator</artifactId>-->
+<!--                        <version>1.1</version>-->
+<!--                    </docletArtifact>-->
 
-                    <excludePackageNames>nl.hsac.*</excludePackageNames>
-                    <includeDependencySources>true</includeDependencySources>
-                    <dependencySourceIncludes>
-                        <dependencySourceInclude>nl.hsac:*</dependencySourceInclude>--&gt;
-                    </dependencySourceIncludes>
-                    <!-- AutoCompleteResponder expects the documentation in wiki/fixtures -->
-                    <reportOutputDirectory>${project.basedir}/src/main/resources/META-INF/</reportOutputDirectory>
-                    <useStandardDocletOptions>false</useStandardDocletOptions>
-                </configuration>
-            </plugin>
+<!--                    <excludePackageNames>nl.hsac.*</excludePackageNames>-->
+<!--                    <includeDependencySources>true</includeDependencySources>-->
+<!--                    <dependencySourceIncludes>-->
+<!--                        <dependencySourceInclude>nl.hsac:*</dependencySourceInclude>&#45;&#45;&gt;-->
+<!--                    </dependencySourceIncludes>-->
+<!--                    &lt;!&ndash; AutoCompleteResponder expects the documentation in wiki/fixtures &ndash;&gt;-->
+<!--                    <reportOutputDirectory>${project.basedir}/src/main/resources/META-INF/</reportOutputDirectory>-->
+<!--                    <useStandardDocletOptions>false</useStandardDocletOptions>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
 
         </plugins>
 

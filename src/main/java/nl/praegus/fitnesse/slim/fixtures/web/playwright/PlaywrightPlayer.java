@@ -14,13 +14,17 @@ import static com.microsoft.playwright.Page.ScreenshotOptions;
 public class PlaywrightPlayer extends SlimFixture {
     private final PageObjects pageObjects = PageObjects.getInstance();
     private final Playwright playwright = Playwright.create();
+    private Browser browser;
+    private BrowserType.LaunchOptions launchOptions = new BrowserType.LaunchOptions();
+    private final BrowserContext ctx;
+    private Page currentPage;
+
     private final File screenshotFolder = new File(getEnvironment().getFitNesseFilesSectionDir(), "screenshots");
     private final String pageSourceFolder = getEnvironment().getFitNesseFilesSectionDir() + "/pagesource/";
     private final File downloadFolder = new File(getEnvironment().getFitNesseFilesSectionDir(), "downloads");
-    private final BrowserContext ctx;
-    private Browser browser;
-    private Page currentPage;
     private final FileFixture fileFixture = new FileFixture();
+
+
 
     public PlaywrightPlayer(String browserName) {
         startBrowser(browserName);
@@ -35,16 +39,20 @@ public class PlaywrightPlayer extends SlimFixture {
         navigateTo(url);
     }
 
+    public void setHeadless(Boolean setHeadless) {
+        this.launchOptions.setHeadless(setHeadless);
+    }
+
     private void startBrowser(String browserName) {
         switch (browserName.toLowerCase()) {
             case "chromium":
-                browser = playwright.chromium().launch();
+                browser = playwright.chromium().launch(launchOptions);
                 break;
             case "firefox":
-                browser = playwright.firefox().launch();
+                browser = playwright.firefox().launch(launchOptions);
                 break;
             case "webkit":
-                browser = playwright.webkit().launch();
+                browser = playwright.webkit().launch(launchOptions);
                 break;
             default:
                 throw new SlimFixtureException(false, "Unsupported browser name. Use chromium, firefox or webkit!");
@@ -191,7 +199,7 @@ public class PlaywrightPlayer extends SlimFixture {
         }
     }
 
-    private Integer toMilliSeconds(Integer timeoutInSeconds){
+    private Integer toMilliSeconds(Integer timeoutInSeconds) {
         return timeoutInSeconds * 1000;
     }
 
@@ -203,4 +211,6 @@ public class PlaywrightPlayer extends SlimFixture {
         }
         return t;
     }
+
+
 }
