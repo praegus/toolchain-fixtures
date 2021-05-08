@@ -8,74 +8,58 @@ import nl.praegus.fitnesse.slim.fixtures.web.playwright.environment.PageObjects;
 
 import java.io.File;
 import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Map;
 
 import static com.microsoft.playwright.Page.ScreenshotOptions;
 
 public class PlaywrightPlayer extends SlimFixture {
     private final PageObjects pageObjects = PageObjects.getInstance();
-    private final Playwright playwright = Playwright.create();
-    private Browser browser;
-    private BrowserType.LaunchOptions launchOptions = new BrowserType.LaunchOptions();
-    private final BrowserContext ctx;
-    private Page currentPage;
+    private Browser browser = PlaywrightSetup.getBrowser();
+    //private BrowserType.LaunchOptions launchOptions = new BrowserType.LaunchOptions();
+    private BrowserContext browserContext = browser.newContext();
 
+    private Page currentPage = browserContext.newPage();
+    private CookieManager cookieManager = new CookieManager(browserContext);
     private final File screenshotFolder = new File(getEnvironment().getFitNesseFilesSectionDir(), "screenshots");
+
     private final String pageSourceFolder = getEnvironment().getFitNesseFilesSectionDir() + "/pagesource/";
     private final File downloadFolder = new File(getEnvironment().getFitNesseFilesSectionDir(), "downloads");
     private final FileFixture fileFixture = new FileFixture();
 
-
-
-    public PlaywrightPlayer(String browserName) {
-        startBrowser(browserName);
-        ctx = browser.newContext(new Browser.NewContextOptions().setAcceptDownloads(true));
-        currentPage = ctx.newPage();
-    }
-
-    public PlaywrightPlayer(String browserName, String url) {
-        startBrowser(browserName);
-        ctx = browser.newContext(new Browser.NewContextOptions().setAcceptDownloads(true));
-        currentPage = ctx.newPage();
-        navigateTo(url);
-    }
-
-    public void setHeadless(Boolean setHeadless) {
-        this.launchOptions.setHeadless(setHeadless);
-    }
-
-    private void startBrowser(String browserName) {
-        switch (browserName.toLowerCase()) {
-            case "chromium":
-                browser = playwright.chromium().launch(launchOptions);
-                break;
-            case "firefox":
-                browser = playwright.firefox().launch(launchOptions);
-                break;
-            case "webkit":
-                browser = playwright.webkit().launch(launchOptions);
-                break;
-            default:
-                throw new SlimFixtureException(false, "Unsupported browser name. Use chromium, firefox or webkit!");
-        }
+    public BrowserContext getBrowserContext() {
+        return browserContext;
     }
 
     public void timeoutInSeconds(Integer timeoutInSeconds) {
         currentPage.setDefaultTimeout(toMilliSeconds(timeoutInSeconds));
     }
 
-    public void navigationTimeoutInSeconds(Integer timeoutInSeconds) {
+    public void navigationTimeout(Integer timeoutInSeconds) {
         currentPage.setDefaultNavigationTimeout(toMilliSeconds(timeoutInSeconds));
     }
 
-    public void navigationTimeout(Integer timeoutInSeconds) {
-        currentPage.setDefaultNavigationTimeout(toMilliSeconds(timeoutInSeconds));
+    public void setCookie(Map<String, String> cookieMap) {
+        cookieManager.setCookie(cookieMap);
+    }
+
+    public void setCookies(List<Map<String, String>> cookiesList) {
+        cookieManager.setCookies(cookiesList);
+    }
+
+    public Map<String, String> getCookies(){
+        return cookieManager.getCookies();
+    }
+
+    public void deleteCookies() {
+        cookieManager.deleteCookies();
     }
 
     public void navigateTo(String url) {
         currentPage.navigate(url);
     }
 
-    public void waitForNavigationAfterClicking(String pageObject) {
+    public void waitForNavigationAfterClickingOn(String pageObject) {
         currentPage.waitForNavigation(() -> click(pageObject));
     }
 
@@ -99,9 +83,13 @@ public class PlaywrightPlayer extends SlimFixture {
         currentPage.keyboard().press(keyOrChord);
     }
 
+    public void type(String text) {
+        currentPage.keyboard().type(text);
+    }
+
     public String valueOf(String pageObject) {
         String selector = getSelector(pageObject);
-        String tagName = currentPage.evalOnSelector(selector, "e => e.tagName").toString();
+        var tagName = currentPage.evalOnSelector(selector, "e => e.tagName").toString();
         Object result;
         if ("input".equalsIgnoreCase(tagName)
                 || "button".equalsIgnoreCase(tagName)
@@ -120,66 +108,67 @@ public class PlaywrightPlayer extends SlimFixture {
     }
 
     public String takeScreenshot(String baseName) {
-        File screenshotFile = new File(screenshotFolder, baseName + ".png");
+        var screenshotFile = new File(screenshotFolder, baseName + ".png");
         ScreenshotOptions opts = new ScreenshotOptions().setPath(screenshotFile.toPath());
         currentPage.screenshot(opts);
         return String.format("<a href=\"%1$s\" target=\"_blank\"><img src=\"%1$s\" title=\"%2$s\" height=\"%3$s\"/></a>",
                 getWikiUrl(screenshotFile.getAbsolutePath()), baseName, 200);
     }
 
-    public void uploadFileFor(String file, String pageObject) {
-        String filePath = getEnvironment().getFilePathFromWikiUrl(file);
-        currentPage.onFileChooser(fileChooser ->
-                fileChooser.setFiles(new File(filePath).toPath()));
-        click(pageObject);
-    }
-
-    public String downloadFileByClicking(String pageObject) {
-        return saveDownloadedFileAsByClicking("", pageObject);
-    }
-
-    public String saveDownloadedFileAsByClicking(String filename, String pageObject) {
-        Download dl = currentPage.waitForDownload(() -> currentPage.click(getSelector(pageObject)));
-
-        String dlFilename = filename.length() > 0 ? filename : dl.suggestedFilename();
-        File downloadedFile = new File(downloadFolder, dlFilename);
-
-        dl.saveAs(downloadedFile.toPath());
-        return String.format("<a href=\"%1s\" target=\"_blank\">%2s</a>", getWikiUrl(downloadedFile.getAbsolutePath()), dlFilename);
-    }
-
-    public String savePageSource(String baseName) {
-        return fileFixture.createContaining(pageSourceFolder + baseName + ".html", currentPage.content());
-    }
-
-    public void switchToNextTab() {
-        int index = ctx.pages().indexOf(currentPage);
-        if (ctx.pages().size() > index + 1) {
-            currentPage = ctx.pages().get(index + 1);
-        } else {
-            currentPage = ctx.pages().get(0);
-        }
-        currentPage.bringToFront();
-    }
-
-    public void switchToPreviousTab() {
-        int index = ctx.pages().indexOf(currentPage);
-        if (index > 0) {
-            currentPage = ctx.pages().get(index - 1);
-        } else {
-            currentPage = ctx.pages().get(ctx.pages().size() - 1);
-        }
-        currentPage.bringToFront();
-    }
-
-    public void closeTab() {
-        currentPage.close();
-        currentPage = ctx.pages().get(0);
-        currentPage.bringToFront();
-    }
-
+    //
+//    public void uploadFileFor(String file, String pageObject) {
+//        String filePath = getEnvironment().getFilePathFromWikiUrl(file);
+//        currentPage.onFileChooser(fileChooser ->
+//                fileChooser.setFiles(new File(filePath).toPath()));
+//        click(pageObject);
+//    }
+//
+//    public String downloadFileByClicking(String pageObject) {
+//        return saveDownloadedFileAsByClicking("", pageObject);
+//    }
+//
+//    public String saveDownloadedFileAsByClicking(String filename, String pageObject) {
+//        var dl = currentPage.waitForDownload(() -> currentPage.click(getSelector(pageObject)));
+//
+//        String dlFilename = filename.length() > 0 ? filename : dl.suggestedFilename();
+//        var downloadedFile = new File(downloadFolder, dlFilename);
+//
+//        dl.saveAs(downloadedFile.toPath());
+//        return String.format("<a href=\"%1s\" target=\"_blank\">%2s</a>", getWikiUrl(downloadedFile.getAbsolutePath()), dlFilename);
+//    }
+//
+//    public String savePageSource(String baseName) {
+//        return fileFixture.createContaining(pageSourceFolder + baseName + ".html", currentPage.content());
+//    }
+//
+//    public void switchToNextTab() {
+//        int index = browserContext.pages().indexOf(currentPage);
+//        if (browserContext.pages().size() > index + 1) {
+//            currentPage = browserContext.pages().get(index + 1);
+//        } else {
+//            currentPage = browserContext.pages().get(0);
+//        }
+//        currentPage.bringToFront();
+//    }
+//
+//    public void switchToPreviousTab() {
+//        int index = browserContext.pages().indexOf(currentPage);
+//        if (index > 0) {
+//            currentPage = browserContext.pages().get(index - 1);
+//        } else {
+//            currentPage = browserContext.pages().get(browserContext.pages().size() - 1);
+//        }
+//        currentPage.bringToFront();
+//    }
+//
+//    public void closeTab() {
+//        currentPage.close();
+//        currentPage = browserContext.pages().get(0);
+//        currentPage.bringToFront();
+//    }
+//
     public void closeBrowser() {
-        browser.close();
+        this.browser.close();
     }
 
     private String getSelector(String pageObject) {

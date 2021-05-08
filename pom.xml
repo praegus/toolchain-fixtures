@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>nl.praegus</groupId>
@@ -12,8 +13,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <fitnesse.version>20201213</fitnesse.version>
-        <hsac.version>4.24.1</hsac.version>
+        <fitnesse.version>20210410</fitnesse.version>
+        <hsac.version>4.25.0</hsac.version>
         <google.api.version>1.30.7</google.api.version>
     </properties>
 
@@ -287,8 +288,8 @@
                 <version>3.8.1</version>
                 <configuration>
                     <compilerArgument>-parameters</compilerArgument>
-                    <source>8</source>
-                    <target>8</target>
+                    <source>11</source>
+                    <target>11</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -336,42 +337,39 @@
                 </executions>
             </plugin>
 
-            <!-- Aggregate JavaDoc for use with autoCompleteResponder -->
-<!--            <plugin>-->
-<!--                <artifactId>maven-javadoc-plugin</artifactId>-->
-<!--                <extensions>true</extensions>-->
-<!--                <version>3.2.0</version>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <phase>generate-resources</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>javadoc</goal>-->
-<!--                        </goals>-->
-<!--                    </execution>-->
-<!--                </executions>-->
+            <!--            Aggregate JavaDoc for use with autoCompleteResponder-->
+            <plugin>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <extensions>true</extensions>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>javadoc</goal>
+                        </goals>
+                    </execution>
+                </executions>
 
-<!--                <configuration>-->
-<!--                    <doclet>nl.praegus.doclets.FixtureDocGenerator</doclet>-->
-<!--                    <docletArtifact>-->
-<!--                        <groupId>nl.praegus</groupId>-->
-<!--                        <artifactId>fixture-doc-generator</artifactId>-->
-<!--                        <version>1.1</version>-->
-<!--                    </docletArtifact>-->
+                <configuration>
+                    <doclet>nl.praegus.doclets.FixtureDocGenerator</doclet>
+                    <docletArtifact>
+                        <groupId>nl.praegus</groupId>
+                        <artifactId>fixture-doc-generator</artifactId>
+                        <version>1.1</version>
+                    </docletArtifact>
 
-<!--                    <excludePackageNames>nl.hsac.*</excludePackageNames>-->
-<!--                    <includeDependencySources>true</includeDependencySources>-->
-<!--                    <dependencySourceIncludes>-->
-<!--                        <dependencySourceInclude>nl.hsac:*</dependencySourceInclude>&#45;&#45;&gt;-->
-<!--                    </dependencySourceIncludes>-->
-<!--                    &lt;!&ndash; AutoCompleteResponder expects the documentation in wiki/fixtures &ndash;&gt;-->
-<!--                    <reportOutputDirectory>${project.basedir}/src/main/resources/META-INF/</reportOutputDirectory>-->
-<!--                    <useStandardDocletOptions>false</useStandardDocletOptions>-->
-<!--                </configuration>-->
-<!--            </plugin>-->
-
+                    <excludePackageNames>nl.hsac.*</excludePackageNames>
+                    <includeDependencySources>true</includeDependencySources>
+                    <dependencySourceIncludes>
+                        <dependencySourceInclude>nl.hsac:*</dependencySourceInclude>--&gt;
+                    </dependencySourceIncludes>
+                    <!-- AutoCompleteResponder expects the documentation in wiki/fixtures -->
+                    <reportOutputDirectory>${project.basedir}/src/main/resources/META-INF/</reportOutputDirectory>
+                    <useStandardDocletOptions>false</useStandardDocletOptions>
+                </configuration>
+            </plugin>
         </plugins>
-
-
     </build>
 
     <packaging>jar</packaging>

@@ -19,6 +19,4 @@ public class PageObject extends SlimFixtureWithMap {
         pageObjects.storePageObject(name, getCurrentValues());
         return super.afterCompletion(method, arguments, result);
     }
-
-
 }
