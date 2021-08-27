@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.model.BinaryBody.binary;
@@ -198,6 +199,7 @@ public class MockServer extends SlimFixture {
      */
     public void stopMockServer() {
         mock.stop();
+        mock.hasStopped(40, 100L, TimeUnit.MILLISECONDS);
     }
 
     private HttpResponse createResponse(Map<String, Object> responseProperties) {
@@ -234,7 +236,7 @@ public class MockServer extends SlimFixture {
                     }
                     break;
                 default:
-                    throw new SlimFixtureException("Unknown reponse property: " + prop);
+                    throw new SlimFixtureException(false, "Unknown reponse property: " + prop);
             }
         }
         return resp;
@@ -297,11 +299,11 @@ public class MockServer extends SlimFixture {
                             req = req.withBody(new RegexBody(rules.get(rule).toString().split("=",2)[1]));
                             break;
                         default:
-                            throw new SlimFixtureException("Unknown body filter: " + rules.get(rule).toString() + ". jsonpath= , xpath= and regex= is supported.");
+                            throw new SlimFixtureException(false, "Unknown body filter: " + rules.get(rule).toString() + ". jsonpath= , xpath= and regex= is supported.");
                     }
                     break;
                 default:
-                    throw new SlimFixtureException("Unknown rule: " + rule);
+                    throw new SlimFixtureException(false, "Unknown rule: " + rule);
             }
         }
         return req;
