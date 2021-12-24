@@ -256,7 +256,7 @@
         <dependency>
             <groupId>com.microsoft.playwright</groupId>
             <artifactId>playwright</artifactId>
-            <version>1.10.0</version>
+            <version>1.17.2</version>
         </dependency>
 
         <!-- for unittest -->
