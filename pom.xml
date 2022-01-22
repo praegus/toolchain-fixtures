@@ -12,9 +12,9 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <fitnesse.version>20201213</fitnesse.version>
-        <hsac.version>4.23.1</hsac.version>
-        <google.api.version>1.30.7</google.api.version>
+        <fitnesse.version>20211030</fitnesse.version>
+        <hsac.version>4.31.0</hsac.version>
+        <google.api.version>1.33.1</google.api.version>
     </properties>
 
     <dependencies>
@@ -46,7 +46,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.13.1</version>
+            <version>4.13.2</version>
         </dependency>
         <!-- Gmail -->
         <dependency>
@@ -89,7 +89,7 @@
         <dependency>
             <groupId>com.google.oauth-client</groupId>
             <artifactId>google-oauth-client-jetty</artifactId>
-            <version>1.30.5</version>
+            <version>1.31.5</version>
             <exclusions>
                 <exclusion>
                     <!--conflicts with google-api-client-->

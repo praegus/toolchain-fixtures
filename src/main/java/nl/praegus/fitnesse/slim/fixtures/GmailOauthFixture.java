@@ -8,8 +8,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.client.util.Base64;
+import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.util.StringUtils;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.gmail.Gmail;
@@ -37,14 +36,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class GmailOauthFixture extends SlimFixture {
-    private String APPLICATION_NAME;
-    private FileDataStoreFactory DATA_STORE_FACTORY;
-    private JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
-    private HttpTransport HTTP_TRANSPORT;
-    private List<String> SCOPES = Collections.singletonList(GmailScopes.MAIL_GOOGLE_COM);
+    private String applicationName;
+    private FileDataStoreFactory dataStoreFactory;
+    private final JsonFactory gsonFactory = GsonFactory.getDefaultInstance();
+    private HttpTransport httpTransport;
+    private final List<String> scopes = Collections.singletonList(GmailScopes.MAIL_GOOGLE_COM);
     private String filterQuery = "";
     private Gmail service;
-    private String user = "me"; //Default to special user "me" - pointing to the logged in user
+    private static final String ME = "me"; //Default to special user "me" - pointing to the logged-in user
     private String latestMessageBody = "";
     private List<String> latestMessageAttachments = new ArrayList<>();
     private String latestMessageId;
@@ -52,6 +51,7 @@ public class GmailOauthFixture extends SlimFixture {
     private String bodyMimeType = "text/plain";
     private static final Pattern URL_PATTERN =
             Pattern.compile("https?://(www\\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_+.~#?&/=!]*)");
+    private static final String ATTACHMENT = "attachment";
 
     /**
      * Create a gmail connection for the given App
@@ -60,10 +60,10 @@ public class GmailOauthFixture extends SlimFixture {
      */
     public GmailOauthFixture(String appName) {
         try {
-            HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-            APPLICATION_NAME = appName;
-            File DATA_STORE_DIR = new File(this.filesDir, String.format("gmailOauthFixture/%s/.credentials/gmail-credentials", APPLICATION_NAME));
-            DATA_STORE_FACTORY = new FileDataStoreFactory(DATA_STORE_DIR);
+            httpTransport = GoogleNetHttpTransport.newTrustedTransport();
+            applicationName = appName;
+            File dataStoreDir = new File(this.filesDir, String.format("gmailOauthFixture/%s/.credentials/gmail-credentials", applicationName));
+            dataStoreFactory = new FileDataStoreFactory(dataStoreDir);
             service = getGmailService();
         } catch (Exception e) {
             e.printStackTrace();
@@ -98,7 +98,7 @@ public class GmailOauthFixture extends SlimFixture {
     }
 
     private void setLatestMessageBody(String base64EncodedMessageBody) {
-        latestMessageBody = StringUtils.newStringUtf8(Base64.decodeBase64(base64EncodedMessageBody));
+        latestMessageBody = StringUtils.newStringUtf8(Base64.getDecoder().decode(base64EncodedMessageBody));
     }
 
     /**
@@ -170,7 +170,7 @@ public class GmailOauthFixture extends SlimFixture {
      */
     public boolean trashCurrentMessage() {
         try {
-            getAllMessages().trash(user, latestMessageId).execute();
+            getAllMessages().trash(ME, latestMessageId).execute();
             return true;
         } catch (IOException e) {
             System.err.println(e.getMessage());
@@ -185,7 +185,7 @@ public class GmailOauthFixture extends SlimFixture {
      */
     public boolean deleteCurrentMessage() {
         try {
-            getAllMessages().delete(user, latestMessageId).execute();
+            getAllMessages().delete(ME, latestMessageId).execute();
             return true;
         } catch (IOException e) {
             System.err.println(e.getMessage());
@@ -218,12 +218,12 @@ public class GmailOauthFixture extends SlimFixture {
     public boolean sendEmail(Map<String, String> emailData) {
         MimeMessage msg;
         try {
-            if (emailData.containsKey("attachment") && emailData.get("attachment").length() > 0) {
+            if (emailData.containsKey(ATTACHMENT) && emailData.get(ATTACHMENT).length() > 0) {
                 msg = createMessageWithAttachment(emailData.get("to"),
                         emailData.get("from"),
                         emailData.get("subject"),
                         emailData.get("body"),
-                        new File(getFilePathFromWikiUrl(emailData.get("attachment"))));
+                        new File(getFilePathFromWikiUrl(emailData.get(ATTACHMENT))));
             } else {
                 msg = createMessageWithText(emailData.get("to"),
                         emailData.get("from"),
@@ -232,7 +232,7 @@ public class GmailOauthFixture extends SlimFixture {
             }
 
             Message message = createMessageWithEmail(msg);
-            message = service.users().messages().send(user, message).execute();
+            message = service.users().messages().send(ME, message).execute();
             System.out.println("Sent message with id: " + message.getId());
             return true;
         } catch (javax.mail.MessagingException | IOException e) {
@@ -290,7 +290,7 @@ public class GmailOauthFixture extends SlimFixture {
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         emailContent.writeTo(buffer);
         byte[] bytes = buffer.toByteArray();
-        String encodedEmail = Base64.encodeBase64URLSafeString(bytes);
+        String encodedEmail = Base64.getEncoder().encodeToString(bytes);
         Message message = new Message();
         message.setRaw(encodedEmail);
         return message;
@@ -320,14 +320,14 @@ public class GmailOauthFixture extends SlimFixture {
     }
 
     protected FunctionalCompletion inboxRetrievedCompletion() {
-        return new FunctionalCompletion(() -> ((null != filteredInbox() && filteredInbox().size() != 0)));
+        return new FunctionalCompletion(() -> (filteredInbox() != null && !filteredInbox().isEmpty()));
     }
 
     private void getLatestMessageInfo() {
         try {
             StringBuilder sb = new StringBuilder();
             List<String> attachments = new ArrayList<>();
-            Message message = getAllMessages().get(user, latestMessageId).setFormat("full").execute();
+            Message message = getAllMessages().get(ME, latestMessageId).setFormat("full").execute();
 
             if (message.getPayload().getParts() != null) {
                 for (MessagePart part : message.getPayload().getParts()) {
@@ -352,13 +352,13 @@ public class GmailOauthFixture extends SlimFixture {
         InputStream in =
                 GmailOauthFixture.class.getResourceAsStream(clientSecret + ".json");
         GoogleClientSecrets clientSecrets =
-                GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
+                GoogleClientSecrets.load(gsonFactory, new InputStreamReader(in));
 
         // Build flow and trigger user authorization request.
         GoogleAuthorizationCodeFlow flow =
                 new GoogleAuthorizationCodeFlow.Builder(
-                        HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
-                        .setDataStoreFactory(DATA_STORE_FACTORY)
+                        httpTransport, gsonFactory, clientSecrets, scopes)
+                        .setDataStoreFactory(dataStoreFactory)
                         .setAccessType("offline")
                         .build();
 
@@ -368,28 +368,28 @@ public class GmailOauthFixture extends SlimFixture {
 
     private Gmail getGmailService() throws IOException {
         Credential credential = authorize();
-        return new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
-                .setApplicationName(APPLICATION_NAME)
+        return new Gmail.Builder(httpTransport, gsonFactory, credential)
+                .setApplicationName(applicationName)
                 .build();
     }
 
     private List<Message> filteredInbox() {
         try {
-            ListMessagesResponse msgResponse = getAllMessages().list(user).setQ(filterQuery).execute();
+            ListMessagesResponse msgResponse = getAllMessages().list(ME).setQ(filterQuery).execute();
             List<Message> messages = msgResponse.getMessages();
-            if (null != messages && messages.size() > 0) {
+            if (messages != null && !messages.isEmpty()) {
                 latestMessageId = messages.get(0).getId();
                 getLatestMessageInfo();
             }
             return messages;
         } catch (IOException e) {
             System.err.println("Exception fetching e-mail: " + e.getMessage());
-            return null;
+            return Collections.emptyList();
         }
     }
 
     private void batchDeleteMessages(List<String> messageIds) throws IOException {
-        getAllMessages().batchDelete(user, new BatchDeleteMessagesRequest().setIds(messageIds)).execute();
+        getAllMessages().batchDelete(ME, new BatchDeleteMessagesRequest().setIds(messageIds)).execute();
     }
 
     private Messages getAllMessages() {
