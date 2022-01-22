@@ -37,7 +37,7 @@ A fixture to easily interact with the /xas endpoint of Mendix web applications. 
 ### Mendix Browser Test
 A set of helper methods for BrowserTest that make interacting with Mendix Apps easier.
 
-### Praegus Browser Test
+### Praegus Browser Test (WebBrowser)
 A set of methods for BrowserTest with added functionality for loaders, blur after sending text, stop test on exceptions and adding an attempt at browser resize when set browser size to maximum fails.
 
 ### TOTP fixture
@@ -53,6 +53,14 @@ Returns whole numbers by default, precision can be added to the constructor.
 
 ### Mock server
 A Fixture that allows advanced mocking, proxying and forwarding for HTTP(S)
+
+### Azure Key Vault Secrets Fixture
+A fixture that lets you get secrets from keyvault and assign them to slim symbols without exposing them in the wiki pages/test reports.
+To use key vault, create an app registration for this fixture in your Azure AD. In the app registration settings, you can find the client id, tenant id and set a client secret for access.
+For more authentication options, see: [Default Azure Credential docs](https://docs.microsoft.com/en-us/java/api/com.azure.identity.defaultazurecredential?view=azure-java-stable)
+
+### HiddenSlimSymbolsFixture
+A fixture that lets you assign system property - or environment variable values to slim symbols without exposing them in wiki pages / test results 
 
 ## Other extra's
 
