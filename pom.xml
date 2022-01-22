@@ -89,7 +89,7 @@
         <dependency>
             <groupId>com.google.oauth-client</groupId>
             <artifactId>google-oauth-client-jetty</artifactId>
-            <version>1.31.5</version>
+            <version>1.33.0</version>
             <exclusions>
                 <exclusion>
                     <!--conflicts with google-api-client-->
