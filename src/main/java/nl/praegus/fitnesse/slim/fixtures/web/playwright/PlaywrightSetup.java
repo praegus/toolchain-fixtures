@@ -7,7 +7,7 @@ import com.microsoft.playwright.options.ColorScheme;
 import nl.hsac.fitnesse.fixture.slim.SlimFixture;
 import nl.hsac.fitnesse.fixture.slim.SlimFixtureException;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 public final class PlaywrightSetup extends SlimFixture {
@@ -23,7 +23,7 @@ public final class PlaywrightSetup extends SlimFixture {
     public static void startBrowser(String browserName) {
         switch (browserName.toLowerCase()) {
             case "chromium":
-                browser = playwright.chromium().launch(launchOptions.setArgs(Arrays.asList("--disable-dev-shm-usage")));
+                browser = playwright.chromium().launch(launchOptions.setArgs(List.of("--disable-dev-shm-usage")));
                 break;
             case "firefox":
                 browser = playwright.firefox().launch(launchOptions);
@@ -62,10 +62,6 @@ public final class PlaywrightSetup extends SlimFixture {
 
     public static void setViewportWidthAndHeight(int width, int height){
         newContextOptions.setViewportSize(width,height);
-    }
-
-    public static void setStrict(Boolean isStrict){
-        newContextOptions.setStrictSelectors(isStrict);
     }
 
     public static Browser.NewContextOptions getNewContextOptions() {

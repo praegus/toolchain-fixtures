@@ -30,11 +30,38 @@ public class PlaywrightFixture extends SlimFixture {
         return browserContext;
     }
 
+    private Locator getLocator(String selector) {
+        return currentPage.locator(selector);
+    }
+
+    /**
+     * Sets the timeout for the current browser context.
+     *
+     * @param timeoutInMilliseconds
+     */
     public void setTimeout(Double timeoutInMilliseconds) {
         timeout = timeoutInMilliseconds;
         browserContext.setDefaultTimeout(timeout);
     }
 
+    //Page management
+    public void openNewContext() {
+        browserContext = browser.newContext();
+    }
+
+    public void closePage() {
+        currentPage.close();
+    }
+
+    public void closeContext() {
+        browserContext.close();
+    }
+
+    public void acceptNextDialog() {
+        currentPage.onceDialog(Dialog::accept);
+    }
+
+    //     Tab management
     public void switchToNextTab() {
         currentPage = browserContext.pages().get(getPageIndex(currentPage) + 1);
         currentPage.bringToFront();
@@ -67,6 +94,7 @@ public class PlaywrightFixture extends SlimFixture {
         return browserContext.pages().indexOf(page);
     }
 
+    //Cookie management
     public void setCookie(Map<String, String> cookieMap) {
         cookieManager.setCookie(cookieMap, browserContext);
     }
@@ -83,63 +111,60 @@ public class PlaywrightFixture extends SlimFixture {
         cookieManager.deleteCookies(browserContext);
     }
 
+    //Navigation
     public void navigateTo(String url) {
         currentPage.navigate(url);
+    }
+
+    public void open(String url) {
+        this.currentPage = browserContext.newPage();
+        navigateTo(url);
+    }
+
+    public void goBack() {
+        currentPage.goBack();
+    }
+
+    public void reloadPage() {
+        currentPage.reload();
+    }
+
+    //User page interaction
+    public void click(String selector) {
+        getLocator(selector).click();
+    }
+
+    public void clickTimes(int times, String selector) {
+        for (int i = 0; i < times; i++) {
+            this.click(selector);
+        }
     }
 
     public void clickAndWaitForNavigation(String selector) {
         currentPage.waitForNavigation(() -> this.click(selector));
     }
 
-    public void waitForSelector(String selector) {
-        currentPage.waitForSelector(selector);
-    }
-
-    public void waitForSelectorHidden(String selector) {
-        currentPage.waitForSelector(selector, new Page.WaitForSelectorOptions().setState(WaitForSelectorState.HIDDEN));
-    }
-
-    public void waitForSelectorPresent(String selector) {
-        currentPage.waitForSelector(selector, new Page.WaitForSelectorOptions().setState(WaitForSelectorState.ATTACHED));
-    }
-
-    public void waitForUrl(String url) {
-        currentPage.waitForURL(url);
-    }
-
-    public Boolean isVisible(String selector) {
-        return currentPage.isVisible(selector, new Page.IsVisibleOptions());
-    }
-
-    public Boolean isHidden(String selector) {
-        return currentPage.isHidden(selector, new Page.IsHiddenOptions());
-    }
-
-    public void click(String selector) {
-        currentPage.click(selector, new Page.ClickOptions());
-    }
-
-    public void clickTimes(int times, String selector) {
-        for(int i=0; i<times; i++) {
-            this.click(selector);
-        }
-    }
     public void doubleClick(String selector) {
-        currentPage.dblclick(selector, new Page.DblclickOptions());
+        getLocator(selector).dblclick();
     }
 
     public void enterAs(String value, String selector) {
-        currentPage.fill(selector, value, new Page.FillOptions());
+        getLocator(selector).fill(value);
     }
 
     public void selectIn(String value, String selector) {
-        currentPage.selectOption(selector, new SelectOption().setLabel(value), new Page.SelectOptionOptions());
+        getLocator(selector).selectOption(new SelectOption().setLabel(value));
     }
 
-    public boolean isEnabled(String selector) {
-        return currentPage.isEnabled(selector, new Page.IsEnabledOptions());
+    public void selectCheckbox(String selector) {
+        getLocator(selector).check();
     }
 
+    public void forceSelectCheckbox(String selector) {
+        getLocator(selector).check(new Locator.CheckOptions().setForce(true));
+    }
+
+    //Keyboard interaction
     public void press(String keyOrChord) {
         currentPage.keyboard().press(keyOrChord);
     }
@@ -148,12 +173,21 @@ public class PlaywrightFixture extends SlimFixture {
         currentPage.keyboard().type(text);
     }
 
-    public void goBack() {
-        currentPage.goBack();
+    //Waiting stuff
+    public void waitForUrl(String url) {
+        currentPage.waitForURL(url);
     }
 
-    public String getUrl() {
-        return currentPage.url();
+    public void waitForVisible(String selector) {
+        getLocator(selector).waitFor();
+    }
+
+    public void waitForHidden(String selector) {
+        getLocator(selector).waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.HIDDEN));
+    }
+
+    public void waitForPresentInDom(String selector) {
+        getLocator(selector).waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.ATTACHED));
     }
 
     public void waitForNetworkIdle() {
@@ -168,27 +202,55 @@ public class PlaywrightFixture extends SlimFixture {
         waitForMilliseconds(toMilliSeconds(timeout));
     }
 
-    public void reloadPage() {
-        currentPage.reload();
+    public void waitForNavigation() {
+        currentPage.waitForNavigation(() -> {
+        });
     }
 
+    //Assertions
+    public boolean isVisible(String selector) {
+        return getLocator(selector).isVisible();
+    }
+
+    public boolean isHidden(String selector) {
+        return getLocator(selector).isHidden();
+    }
+
+    public boolean isEnabled(String selector) {
+        return getLocator(selector).isEnabled();
+    }
+
+    public boolean isChecked(String selector) {
+        return getLocator(selector).isChecked();
+    }
+
+    public boolean clickOnOpensTabWithUrl(String selector, String url) {
+        return browserContext.waitForPage(() -> getLocator(selector).click(new Locator.ClickOptions())).url().equals(url);
+    }
+
+    public boolean clickOnAndWaitOpensTabWithUrl(String selector, String url) {
+        browserContext.waitForPage(() -> getLocator(selector).click()).waitForURL(url);
+        return true;
+    }
+
+    //Value retrieval
     public String valueOf(String selector) {
         String result;
-        switch (currentPage.evalOnSelector(selector, "e => e.tagName", null, new Page.EvalOnSelectorOptions()).toString().toLowerCase()) {
+        switch (getLocator(selector).evaluate("e => e.tagName", null, new Locator.EvaluateOptions()).toString().toLowerCase()) {
             case "input":
             case "textarea":
-                result = currentPage.inputValue(selector, new Page.InputValueOptions());
+                result = getLocator(selector).inputValue();
                 break;
             case "button":
             case "option":
             case "select":
-                result = currentPage.evalOnSelector(selector, "e => e.value", null, new Page.EvalOnSelectorOptions()).toString();
+                result = getLocator(selector).evaluate("e => e.value", null, new Locator.EvaluateOptions()).toString();
                 break;
             case "text":
-                result = currentPage.innerHTML(selector, new Page.InnerHTMLOptions());
+                result = getLocator(selector).innerHTML();
                 break;
             default:
-                result = currentPage.innerText(selector, new Page.InnerTextOptions());
+                result = getLocator(selector).innerText();
         }
         return result;
     }
@@ -206,22 +268,15 @@ public class PlaywrightFixture extends SlimFixture {
         return getNormalizedText(valueOf(selector).trim());
     }
 
-    public static String getNormalizedText(String text) {
+    public String getNormalizedText(String text) {
         return (text != null) ? Pattern.compile("[" + "\u00a0" + "\\s]+").matcher(text).replaceAll(" ") : null;
     }
 
-    public Boolean isChecked(String selector) {
-        return currentPage.isChecked(selector, new Page.IsCheckedOptions());
+    public String getUrl() {
+        return currentPage.url();
     }
 
-    public void selectCheckbox(String selector) {
-        currentPage.check(selector, new Page.CheckOptions());
-    }
-
-    public void forceSelectCheckbox(String selector) {
-        currentPage.check(selector, new Page.CheckOptions().setForce(true));
-    }
-
+    //Taking screenshots
     public String takeScreenshot(String baseName) {
         var screenshotFile = new File(screenshotFolder, baseName + ".png");
         currentPage.screenshot(new Page.ScreenshotOptions().setPath(screenshotFile.toPath()).setFullPage(true));
@@ -234,6 +289,8 @@ public class PlaywrightFixture extends SlimFixture {
         return takeScreenshot(String.valueOf(Instant.now().toEpochMilli()));
     }
 
+    //Debugging
+
     /**
      * Calling pause() starts the PlayWright Inspector, but only when NOT running headless!
      * Scripts recorded in the Playwright Inspector can not be used in FitNesse, but the inspector might be useful
@@ -241,32 +298,6 @@ public class PlaywrightFixture extends SlimFixture {
      */
     public void pause() {
         currentPage.pause();
-    }
-
-    public void saveStorageState() {
-        storageState = browserContext.storageState();
-    }
-
-    public String getStorageState() {
-        return storageState;
-    }
-
-    public void openNewContextWithSavedStorageState() {
-        this.browserContext = browser.newContext(PlaywrightSetup.getNewContextOptions().setStorageState(getStorageState()));
-        setTimeout(timeout);
-    }
-
-    public void openNewContext() {
-        browserContext = browser.newContext();
-    }
-
-    public void open(String url) {
-        this.currentPage = browserContext.newPage();
-        navigateTo(url);
-    }
-
-    public void closePage() {
-        currentPage.close();
     }
 
     public String getCurrentPage() {
@@ -285,27 +316,21 @@ public class PlaywrightFixture extends SlimFixture {
         return browserContext.toString();
     }
 
-    public boolean clickOnOpensTabWithUrl(String selector, String url) {
-        return browserContext.waitForPage(() -> currentPage.click(selector, new Page.ClickOptions())).url().equals(url);
+    //Manage re-usable state
+    public void saveStorageState() {
+        storageState = browserContext.storageState();
     }
 
-    public void clickOnOpensTab(String selector) {
-        this.currentPage = browserContext.waitForPage(() -> currentPage.click(selector));
+    public String getStorageState() {
+        return storageState;
     }
 
-    public Boolean clickOnAndWaitOpensTabWithUrl(String selector, String url) {
-        browserContext.waitForPage(() -> currentPage.click(selector)).waitForURL(url);
-        return true;
+    public void openNewContextWithSavedStorageState() {
+        this.browserContext = browser.newContext(PlaywrightSetup.getNewContextOptions().setStorageState(getStorageState()));
+        setTimeout(timeout);
     }
 
-    public void closeContext() {
-        browserContext.close();
-    }
-
-    public void acceptNextDialog() {
-        currentPage.onceDialog(Dialog::accept);
-    }
-
+    //Tracing
     public void startTrace() {
         browserContext.tracing().start(new Tracing.StartOptions().setScreenshots(true).setSnapshots(true));
     }
@@ -323,12 +348,32 @@ public class PlaywrightFixture extends SlimFixture {
         CLI.main(args);
     }
 
-    public static Double toMilliSeconds(Integer timeoutInSeconds) {
-        return (double) timeoutInSeconds * 1000;
-    }
-
     public void openTrace() throws IOException, InterruptedException {
         openTrace("trace");
+    }
+
+    //Network
+    public void clickAndWaitForResponseFromUrl(String selector, String url) {
+        currentPage.waitForResponse(url, () -> this.click(selector));
+    }
+
+    public void enterAsAndWaitForResponseFromUrl(String value, String selector, String url) {
+        currentPage.waitForResponse(url, () -> this.enterAs(value, selector));
+    }
+
+    public void waitForResponseFromUrl(String url) {
+        currentPage.waitForResponse(url, () -> {
+        });
+    }
+
+    public void waitForResponseFromUrlMatching(String urlRegex) {
+        currentPage.waitForResponse(Pattern.compile(urlRegex), () -> {
+        });
+    }
+
+    //Utility
+    public static Double toMilliSeconds(Integer timeoutInSeconds) {
+        return (double) timeoutInSeconds * 1000;
     }
 
     @Override
