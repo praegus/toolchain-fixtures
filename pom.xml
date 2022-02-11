@@ -13,8 +13,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <fitnesse.version>20210410</fitnesse.version>
-        <hsac.version>4.25.0</hsac.version>
+        <fitnesse.version>20211030</fitnesse.version>
+        <hsac.version>4.32.0</hsac.version>
         <google.api.version>1.30.7</google.api.version>
     </properties>
 
@@ -275,7 +275,7 @@
         <dependency>
             <groupId>com.microsoft.playwright</groupId>
             <artifactId>playwright</artifactId>
-            <version>1.17.2</version>
+            <version>1.18.0</version>
         </dependency>
 
         <!-- for unittest -->

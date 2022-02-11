@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+@SuppressWarnings("unused")
 public class PlaywrightFixture extends SlimFixture {
     private final Browser browser = PlaywrightSetup.getBrowser();
     private BrowserContext browserContext = browser.newContext(PlaywrightSetup.getNewContextOptions());
