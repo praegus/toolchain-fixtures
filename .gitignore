@@ -8,3 +8,4 @@ src/main/resources/META-INF/apidocs
 .project
 .classpath
 .settings/*
+.vscode/*
