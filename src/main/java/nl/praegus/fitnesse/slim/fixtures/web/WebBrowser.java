@@ -3,6 +3,9 @@ package nl.praegus.fitnesse.slim.fixtures.web;
 import nl.hsac.fitnesse.fixture.slim.SlimFixtureException;
 import nl.hsac.fitnesse.fixture.slim.StopTestException;
 import nl.hsac.fitnesse.fixture.slim.web.BrowserTest;
+import nl.hsac.fitnesse.fixture.slim.web.annotation.WaitUntil;
+import nl.hsac.fitnesse.fixture.util.selenium.AllFramesDecorator;
+import nl.hsac.fitnesse.fixture.util.selenium.by.TechnicalSelectorBy;
 import nl.hsac.fitnesse.slim.interaction.ReflectionHelper;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -16,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * An extension on BrowserTest that houses some power-user features
@@ -267,5 +271,16 @@ public class WebBrowser extends BrowserTest<WebElement> {
             }
         }
         return true;
+    }
+    @WaitUntil
+    public int countTechnicalSelectorMatches(String place) {
+      if(TechnicalSelectorBy.forPlace(place) == null) {
+        throw new SlimFixtureException("Error: place must be a technical selector.");
+      }
+      AtomicInteger count = new AtomicInteger();
+      (new AllFramesDecorator<Integer>(getSeleniumHelper())).apply(() -> {
+        return count.addAndGet(getSeleniumHelper().driver().findElements(TechnicalSelectorBy.forPlace(place)).size());
+      });
+      return count.get();
     }
 }
