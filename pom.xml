@@ -7,7 +7,7 @@
     <url>https://github.com/praegus/toolchain-fixtures</url>
     <name>Praegus Toolchain extended fixture pack</name>
     <description>Extensions on existing fixtures to aid in automated testing</description>
-    <version>1.27-SNAPSHOT</version>
+    <version>1.28-SNAPSHOT</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -466,6 +466,34 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+        <profile>
+            <id>github-release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>2.4</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+            <distributionManagement>
+                <repository>
+                    <id>github</id>
+                    <name>GitHub Praegus Apache Maven Packages</name>
+                    <url>https://maven.pkg.github.com/praegus/toolchain-fixtures</url>
+                </repository>
+            </distributionManagement>
         </profile>
     </profiles>
 
