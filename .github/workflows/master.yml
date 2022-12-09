@@ -22,7 +22,7 @@ jobs:
         uses: samuelmeuli/action-maven-publish@v1
         with:
           server_id: staging
-          maven_goals_phases: clean -P release -DskipTests deploy
+          maven_profiles: release
           gpg_private_key: ${{ secrets.gpg_private_key }}
           gpg_passphrase: ${{ secrets.gpg_passphrase }}
           nexus_username: ${{ secrets.MAVEN_USERNAME }}
