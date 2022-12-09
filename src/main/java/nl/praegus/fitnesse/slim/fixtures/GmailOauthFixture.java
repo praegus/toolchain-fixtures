@@ -8,7 +8,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.util.Base64;
 import com.google.api.client.util.StringUtils;
 import com.google.api.client.util.store.FileDataStoreFactory;
@@ -39,7 +39,7 @@ import java.util.regex.Pattern;
 public class GmailOauthFixture extends SlimFixture {
     private String APPLICATION_NAME;
     private FileDataStoreFactory DATA_STORE_FACTORY;
-    private JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
+    private JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
     private HttpTransport HTTP_TRANSPORT;
     private List<String> SCOPES = Collections.singletonList(GmailScopes.MAIL_GOOGLE_COM);
     private String filterQuery = "";
