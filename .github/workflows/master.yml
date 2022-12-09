@@ -42,16 +42,6 @@ jobs:
         run: mvn versions:set -DremoveSnapshot
       - id: get-version
         uses: JActions/maven-version@v1.0.0
-      - name: Publish to GitHub Packages
-        run: mvn clean -P github-release -DskipTests deploy
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Create changelog text
-        id: changelog
-        uses: loopwerk/tag-changelog@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          exclude_types: other,doc,chore
       - name: Create Release
         id: createRelease
         uses: actions/create-release@v1
@@ -60,7 +50,7 @@ jobs:
         with:
           tag_name: ${{ steps.get-version.outputs.version }}
           release_name: "Toolchain FitNesse Fixtures ${{ steps.get-version.outputs.version }}"
-          body: ${{ steps.changelog.outputs.changes }}
+          body:
           draft: false
           prerelease: false
   update-version:
