@@ -20,8 +20,8 @@ public class KeyVaultSecrets extends SlimFixture implements StatementExecutorCon
     private StatementExecutorInterface context;
 
     /**
-     * Instantiate this fixture abd create a key vault SecretClient for a named vault.
-     * To authenticate, a default Azure credential is used. (see: https://docs.microsoft.com/en-us/java/api/com.azure.identity.defaultazurecredential?view=azure-java-stable)
+     * Instantiate this fixture and create a key vault SecretClient for a named vault.
+     * To authenticate, a default Azure credential is used. (see: <a href="https://docs.microsoft.com/en-us/java/api/com.azure.identity.defaultazurecredential?view=azure-java-stable">...</a>)
      * To use Environment Credential, set the following environment variables:
      * AZURE_CLIENT_ID: [CLIENT_ID]
      * AZURE_TENANT_ID: [TENANT_ID]

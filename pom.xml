@@ -209,13 +209,13 @@
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-security-keyvault-secrets</artifactId>
-            <version>4.2.3</version>
+            <version>4.5.3</version>
         </dependency>
 
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-identity</artifactId>
-            <version>1.7.1</version>
+            <version>1.8.0</version>
         </dependency>
 
         <!-- SOAP Signing -->
