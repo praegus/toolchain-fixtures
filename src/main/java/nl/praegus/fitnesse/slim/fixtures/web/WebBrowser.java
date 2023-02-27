@@ -4,6 +4,7 @@ import nl.hsac.fitnesse.fixture.slim.SlimFixtureException;
 import nl.hsac.fitnesse.fixture.slim.StopTestException;
 import nl.hsac.fitnesse.fixture.slim.web.BrowserTest;
 import nl.hsac.fitnesse.slim.interaction.ReflectionHelper;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.logging.LogEntry;
@@ -267,5 +268,15 @@ public class WebBrowser extends BrowserTest<WebElement> {
             }
         }
         return true;
+    }
+
+    /**
+     * Get the current WebDriver instance from the selenium helper. Useful if interaction with the same browser is
+     * desired using a different fixtire (i.e. Appian fixtures)
+     *
+     * @return the current Webdriver
+     */
+    public WebDriver getWebdriver() {
+        return getSeleniumHelper().driver();
     }
 }
