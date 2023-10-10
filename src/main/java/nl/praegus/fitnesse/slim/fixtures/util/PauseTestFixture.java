@@ -3,7 +3,24 @@ package nl.praegus.fitnesse.slim.fixtures.util;
 import nl.hsac.fitnesse.fixture.slim.SlimFixture;
 import nl.hsac.fitnesse.fixture.slim.StopTestException;
 
+import java.lang.*;
+
 public class PauseTestFixture extends SlimFixture {
+
+    public static void setKeepOnTopDefault(String value) {
+        PausePopupDialog.setKeepOnTopDefault(value);
+    }
+    public static boolean getKeepOnTopDefault() {
+        boolean b = PausePopupDialog.getKeepOnTopDefault();
+        return b;
+    }
+    public static void setKeepOnTop(String keepOnTop) {
+        PausePopupDialog.setKeepOnTop(keepOnTop);
+    }
+    public static boolean getKeepOnTop() {
+        boolean b = PausePopupDialog.getKeepOnTop();
+        return b;
+    }
 
     public void pause() throws StopTestException {
         pause("<no message>");
