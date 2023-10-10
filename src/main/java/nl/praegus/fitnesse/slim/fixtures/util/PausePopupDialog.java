@@ -32,6 +32,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.lang.*;
+import java.util.prefs.*;
 
 @SuppressWarnings("serial")
 public class PausePopupDialog extends JDialog {
@@ -41,7 +43,11 @@ public class PausePopupDialog extends JDialog {
     private int value;
     private static Point center = null;
     private final JLabel label;
-    private static boolean keepOnTop = true;
+    private static boolean keepOnTop;
+
+    static {
+        keepOnTop = getKeepOnTopDefault();
+    }
 
     private synchronized void setValue(int value) {
         this.value = value;
@@ -63,6 +69,23 @@ public class PausePopupDialog extends JDialog {
         return center;
     }
 
+    private static Preferences getPreferences() {
+        Preferences prefs = Preferences.userRoot().node(PausePopupDialog.class.getName());
+        return prefs;
+    }
+    public static void setKeepOnTop(String value) {
+        PausePopupDialog.keepOnTop = Boolean.parseBoolean(value);
+    }
+    public static boolean getKeepOnTop() {
+        return PausePopupDialog.keepOnTop;
+    }
+    public static void setKeepOnTopDefault(String value) {
+        getPreferences().put("keepOnTop", value);    // store the string value
+    }
+    public static boolean getKeepOnTopDefault() {
+        String s = getPreferences().get("keepOnTop", "true");
+        return Boolean.parseBoolean(s);
+    }
     PausePopupDialog(Frame owner, String title, String message, String[] buttons) {
         super(owner, title, true);
 
