@@ -1,5 +1,7 @@
 package nl.praegus.fitnesse.slim.fixtures.helper;
 
+import jakarta.xml.soap.MessageFactory;
+import jakarta.xml.soap.SOAPMessage;
 import nl.hsac.fitnesse.fixture.Environment;
 import nl.hsac.fitnesse.fixture.slim.SlimFixtureException;
 import org.apache.wss4j.common.crypto.Crypto;
@@ -14,7 +16,6 @@ import org.w3c.dom.Document;
 
 import javax.xml.crypto.dsig.CanonicalizationMethod;
 import javax.xml.crypto.dsig.DigestMethod;
-import javax.xml.soap.*;
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 import java.util.Properties;
@@ -28,7 +29,7 @@ public class SoapSigningHelper {
     public static final String VALID_KEY_STORE_TYPES = "JKS, JCEKS, PKCS11";
     public static final String VALID_CANONICALIZATION_METHODS = "INCLUSIVE, INCLUSIVE_WITH_COMMENTS, EXCLUSIVE, EXCLUSIVE_WITH_COMMENTS";
 
-    private Properties signatureKeyProperties = new Properties();
+    private final Properties signatureKeyProperties = new Properties();
 
     private int signatureKeyIdentifierType;
     private String signatureCanonicalizationMethod;
@@ -181,15 +182,15 @@ public class SoapSigningHelper {
         try {
             Crypto crypto = CryptoFactory.getInstance(signatureKeyProperties);
 
-            WSSecSignature signature = new WSSecSignature(secHeader(doc));
-            signature.setUserInfo(signatureKeyProperties.getProperty("org.apache.ws.security.crypto.merlin.keystore.alias"),
+            WSSecSignature wsSecSignature = new WSSecSignature(secHeader(doc));
+            wsSecSignature.setUserInfo(signatureKeyProperties.getProperty("org.apache.ws.security.crypto.merlin.keystore.alias"),
                     signatureKeyProperties.getProperty("privatekeypassword"));
-            signature.setKeyIdentifierType(signatureKeyIdentifierType);
-            signature.setUseSingleCertificate(signatureUseSingleCertificate);
-            signature.setSigCanonicalization(signatureCanonicalizationMethod);
-            signature.setDigestAlgo(signatureDigestAlgorithm);
+            wsSecSignature.setKeyIdentifierType(signatureKeyIdentifierType);
+            wsSecSignature.setUseSingleCertificate(signatureUseSingleCertificate);
+            wsSecSignature.setSigCanonicalization(signatureCanonicalizationMethod);
+            wsSecSignature.setDigestAlgo(signatureDigestAlgorithm);
 
-            return signature.build(crypto);
+            return wsSecSignature.build(crypto);
 
         } catch (Exception e) {
             throw new SlimFixtureException(true, "ERR", e);
@@ -198,11 +199,11 @@ public class SoapSigningHelper {
 
     private Document addTimestamp(Document doc) {
         try {
-            WSSecTimestamp timestamp = new WSSecTimestamp(secHeader(doc));
-            timestamp.setTimeToLive(timestampTTL);
-            timestamp.setPrecisionInMilliSeconds(timestampPrecisionInMillis);
+            WSSecTimestamp wsSecTimestamp = new WSSecTimestamp(secHeader(doc));
+            wsSecTimestamp.setTimeToLive(timestampTTL);
+            wsSecTimestamp.setPrecisionInMilliSeconds(timestampPrecisionInMillis);
 
-            return timestamp.build();
+            return wsSecTimestamp.build();
         } catch (Exception e) {
             throw new SlimFixtureException(true, "ERR", e);
         }
@@ -225,7 +226,7 @@ public class SoapSigningHelper {
         }
     }
 
-    private int getIntValueFromField(Class cls, String field) {
+    private int getIntValueFromField(Class<?> cls, String field) {
         try {
             return cls.getDeclaredField(field).getInt(null);
         } catch (Exception e) {
@@ -233,7 +234,7 @@ public class SoapSigningHelper {
         }
     }
 
-    private String getStringValueFromField(Class cls, String field) {
+    private String getStringValueFromField(Class<?> cls, String field) {
         try {
             return cls.getDeclaredField(field).get(null).toString();
         } catch (Exception e) {

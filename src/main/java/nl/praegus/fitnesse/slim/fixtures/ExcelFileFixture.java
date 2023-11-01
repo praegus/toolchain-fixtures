@@ -1,5 +1,6 @@
 package nl.praegus.fitnesse.slim.fixtures;
 
+import com.google.gson.GsonBuilder;
 import nl.hsac.fitnesse.fixture.slim.SlimFixture;
 import nl.hsac.fitnesse.fixture.slim.SlimFixtureException;
 import org.apache.commons.io.FilenameUtils;

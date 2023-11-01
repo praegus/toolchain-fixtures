@@ -7,14 +7,14 @@
     <url>https://github.com/praegus/toolchain-fixtures</url>
     <name>Praegus Toolchain extended fixture pack</name>
     <description>Extensions on existing fixtures to aid in automated testing</description>
-    <version>1.34-SNAPSHOT</version>
+    <version>1.34-TEST-SNAPSHOT</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <fitnesse.version>20221102</fitnesse.version>
-        <hsac.version>5.2.20</hsac.version>
-        <google.api.version>2.1.1</google.api.version>
+        <fitnesse.version>20230503</fitnesse.version>
+        <hsac.version>5.2.45</hsac.version>
+        <google.api.version>2.1.4</google.api.version>
     </properties>
 
     <dependencies>
@@ -122,7 +122,7 @@
         <dependency>
             <groupId>de.redsix</groupId>
             <artifactId>pdfcompare</artifactId>
-            <version>1.1.61</version>
+            <version>1.1.62</version>
             <exclusions>
                 <exclusion>
                     <!--FitNesse and hsac use slf4j-->
@@ -142,7 +142,7 @@
         <dependency>
             <groupId>com.warrenstrange</groupId>
             <artifactId>googleauth</artifactId>
-            <version>1.2.0</version>
+            <version>1.5.0</version>
             <exclusions>
                 <!--conflicts with hsac version-->
                 <exclusion>
@@ -156,7 +156,7 @@
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
-            <version>5.2.2</version>
+            <version>5.2.4</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-codec</groupId>
@@ -167,7 +167,7 @@
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
-            <version>5.2.2</version>
+            <version>5.2.4</version>
         </dependency>
 
         <!-- MS Token Generator-->
@@ -209,20 +209,20 @@
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-security-keyvault-secrets</artifactId>
-            <version>4.5.3</version>
+            <version>4.7.1</version>
         </dependency>
 
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-identity</artifactId>
-            <version>1.8.0</version>
+            <version>1.10.4</version>
         </dependency>
 
         <!-- SOAP Signing -->
         <dependency>
             <groupId>org.apache.wss4j</groupId>
             <artifactId>wss4j-ws-security-common</artifactId>
-            <version>2.4.1</version>
+            <version>3.0.1</version>
             <exclusions>
                 <!--conflicts with FitNesse version-->
                 <exclusion>
@@ -244,19 +244,19 @@
         <dependency>
             <groupId>org.apache.wss4j</groupId>
             <artifactId>wss4j-ws-security-dom</artifactId>
-            <version>2.2.4</version>
+            <version>3.0.1</version>
         </dependency>
         <dependency>
             <groupId>com.sun.xml.messaging.saaj</groupId>
             <artifactId>saaj-impl</artifactId>
-            <version>1.5.1</version>
+            <version>3.0.3</version>
         </dependency>
 
         <!-- Calculator -->
         <dependency>
             <groupId>org.mariuszgromada.math</groupId>
             <artifactId>MathParser.org-mXparser</artifactId>
-            <version>4.4.0</version>
+            <version>5.2.1</version>
         </dependency>
 
 
