@@ -5,6 +5,7 @@ import nl.hsac.fitnesse.fixture.slim.SlimFixture;
 import nl.hsac.fitnesse.fixture.slim.SlimFixtureException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -58,7 +59,7 @@ public class ExcelFileFixture extends SlimFixture {
      */
     public String valueInRowColumnInSheet(int row, int col, String sheetName) {
         Cell cell = getCell(row, col, sheetName);
-        return cell.getStringCellValue();
+        return new DataFormatter().formatCellValue(cell);
     }
 
     private Cell getCell(int row, int col, String sheetName) {
