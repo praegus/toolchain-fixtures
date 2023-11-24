@@ -22,7 +22,7 @@ import java.util.TimeZone;
  * An extension on BrowserTest that houses some power-user features
  */
 
-public class WebBrowser extends BrowserTest<WebElement> {
+public class WebBrowser<T extends WebElement> extends BrowserTest<T> {
     private final static Set<String> METHODS_NO_WAIT;
     static {
         METHODS_NO_WAIT = ReflectionHelper.validateMethodNames(BrowserTest.class,
@@ -140,7 +140,7 @@ public class WebBrowser extends BrowserTest<WebElement> {
                 if (inputDelay > 0) {
                     waitMilliseconds(inputDelay);
                 }
-                if (progressIndicator != null && progressIndicator.trim().length() > 0) {
+                if (progressIndicator != null && !progressIndicator.trim().isEmpty()) {
                     List<String> fullPath = new ArrayList<>(getCurrentSearchContextPath());
                     clearSearchContext();
                     waitUntil(webDriver -> isNotVisibleOnPage(progressIndicator));

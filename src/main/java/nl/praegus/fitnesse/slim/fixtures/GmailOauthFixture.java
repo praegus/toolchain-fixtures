@@ -320,7 +320,7 @@ public class GmailOauthFixture extends SlimFixture {
     }
 
     protected FunctionalCompletion inboxRetrievedCompletion() {
-        return new FunctionalCompletion(() -> ((null != filteredInbox() && filteredInbox().size() != 0)));
+        return new FunctionalCompletion(() -> (null != filteredInbox() && !filteredInbox().isEmpty()));
     }
 
     private void getLatestMessageInfo() {
@@ -377,14 +377,14 @@ public class GmailOauthFixture extends SlimFixture {
         try {
             ListMessagesResponse msgResponse = getAllMessages().list(user).setQ(filterQuery).execute();
             List<Message> messages = msgResponse.getMessages();
-            if (null != messages && messages.size() > 0) {
+            if (null != messages && !messages.isEmpty()) {
                 latestMessageId = messages.get(0).getId();
                 getLatestMessageInfo();
             }
             return messages;
         } catch (IOException e) {
             System.err.println("Exception fetching e-mail: " + e.getMessage());
-            return null;
+            return Collections.emptyList();
         }
     }
 
