@@ -7,7 +7,7 @@
     <url>https://github.com/praegus/toolchain-fixtures</url>
     <name>Praegus Toolchain extended fixture pack</name>
     <description>Extensions on existing fixtures to aid in automated testing</description>
-    <version>1.36-JDK11</version>
+    <version>1.36-JDK11-SNAPSHOT</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -410,7 +410,7 @@
         <url>https://github.com/praegus/toolchain-fixtures.git</url>
         <developerConnection>scm:git:git@github.com:praegus/toolchain-fixtures.git
         </developerConnection>
-        <tag>toolchain-fixtures-1.36-JDK11</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <profiles>
