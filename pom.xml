@@ -7,14 +7,14 @@
     <url>https://github.com/praegus/toolchain-fixtures</url>
     <name>Praegus Toolchain extended fixture pack</name>
     <description>Extensions on existing fixtures to aid in automated testing</description>
-    <version>1.36-JDK11-SNAPSHOT</version>
+    <version>1.37-JDK11-SNAPSHOT</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <fitnesse.version>20231029</fitnesse.version>
+        <fitnesse.version>20231203</fitnesse.version>
         <hsac.version>5.3.1</hsac.version>
-        <google.api.version>2.1.4</google.api.version>
+        <google.api.version>2.2.0</google.api.version>
         <opensaml.version>4.0.1</opensaml.version>
     </properties>
 
@@ -38,7 +38,16 @@
                 <version>${opensaml.version}</version>
                 <scope>compile</scope>
             </dependency>
-
+            <dependency>
+                <groupId>com.azure</groupId>
+                <artifactId>azure-core</artifactId>
+                <version>1.45.1</version>
+            </dependency>
+            <dependency>
+                <groupId>com.azure</groupId>
+                <artifactId>azure-core-http-netty</artifactId>
+                <version>1.13.11</version>
+            </dependency>
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcprov-jdk15on</artifactId>
@@ -131,7 +140,7 @@
         <dependency>
             <groupId>com.google.apis</groupId>
             <artifactId>google-api-services-gmail</artifactId>
-            <version>v1-rev20220404-2.0.0</version>
+            <version>v1-rev20231106-2.0.0</version>
             <exclusions>
                 <exclusion>
                     <!--conflicts with the direct dependency google-api-client-->
@@ -186,7 +195,7 @@
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
-            <version>5.2.4</version>
+            <version>5.2.5</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-codec</groupId>
@@ -197,7 +206,7 @@
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
-            <version>5.2.4</version>
+            <version>5.2.5</version>
         </dependency>
 
         <!-- MS Token Generator-->
@@ -205,7 +214,7 @@
         <dependency>
             <groupId>com.microsoft.azure</groupId>
             <artifactId>adal4j</artifactId>
-            <version>1.6.5</version>
+            <version>1.6.7</version>
             <exclusions>
                 <!--conflicts with FitNesse version-->
                 <exclusion>
@@ -239,13 +248,13 @@
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-security-keyvault-secrets</artifactId>
-            <version>4.7.1</version>
+            <version>4.7.2</version>
         </dependency>
 
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-identity</artifactId>
-            <version>1.10.4</version>
+            <version>1.11.1</version>
         </dependency>
 
         <!-- SOAP Signing -->
