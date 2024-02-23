@@ -12,9 +12,9 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <fitnesse.version>20231203</fitnesse.version>
-        <hsac.version>5.3.1</hsac.version>
-        <google.api.version>2.2.0</google.api.version>
+        <fitnesse.version>20240219</fitnesse.version>
+        <hsac.version>5.3.11</hsac.version>
+        <google.api.version>2.3.0</google.api.version>
         <opensaml.version>4.0.1</opensaml.version>
     </properties>
 
@@ -22,36 +22,19 @@
         <!-- Opensaml pinned to prevent shibboleth repo dependency -->
         <dependencies>
             <dependency>
-                <groupId>org.opensaml</groupId>
-                <artifactId>opensaml-saml-impl</artifactId>
-                <version>${opensaml.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.opensaml</groupId>
-                <artifactId>opensaml-xacml-impl</artifactId>
-                <version>${opensaml.version}</version>
-                <scope>compile</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.opensaml</groupId>
-                <artifactId>opensaml-xacml-saml-impl</artifactId>
-                <version>${opensaml.version}</version>
-                <scope>compile</scope>
-            </dependency>
-            <dependency>
                 <groupId>com.azure</groupId>
                 <artifactId>azure-core</artifactId>
-                <version>1.45.1</version>
+                <version>1.46.0</version>
             </dependency>
             <dependency>
                 <groupId>com.azure</groupId>
                 <artifactId>azure-core-http-netty</artifactId>
-                <version>1.13.11</version>
+                <version>1.14.0</version>
             </dependency>
             <dependency>
-                <groupId>org.bouncycastle</groupId>
-                <artifactId>bcprov-jdk15on</artifactId>
-                <version>1.70</version>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-compress</artifactId>
+                <version>1.26.0</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -67,12 +50,6 @@
             <groupId>nl.hsac</groupId>
             <artifactId>hsac-fitnesse-fixtures</artifactId>
             <version>${hsac.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>jackson-core</artifactId>
-                </exclusion>
-            </exclusions>
             <scope>provided</scope>
         </dependency>
         <!-- SSH -->
@@ -85,7 +62,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.13.1</version>
+            <version>4.13.2</version>
         </dependency>
         <!-- Gmail -->
         <dependency>
@@ -128,7 +105,7 @@
         <dependency>
             <groupId>com.google.oauth-client</groupId>
             <artifactId>google-oauth-client-jetty</artifactId>
-            <version>1.34.1</version>
+            <version>1.35.0</version>
             <exclusions>
                 <exclusion>
                     <!--conflicts with google-api-client-->
@@ -140,7 +117,7 @@
         <dependency>
             <groupId>com.google.apis</groupId>
             <artifactId>google-api-services-gmail</artifactId>
-            <version>v1-rev20231106-2.0.0</version>
+            <version>v1-rev20231218-2.0.0</version>
             <exclusions>
                 <exclusion>
                     <!--conflicts with the direct dependency google-api-client-->
@@ -161,7 +138,7 @@
         <dependency>
             <groupId>de.redsix</groupId>
             <artifactId>pdfcompare</artifactId>
-            <version>1.1.62</version>
+            <version>1.1.64</version>
             <exclusions>
                 <exclusion>
                     <!--FitNesse and hsac use slf4j-->
@@ -248,7 +225,7 @@
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-security-keyvault-secrets</artifactId>
-            <version>4.7.2</version>
+            <version>4.7.3</version>
         </dependency>
 
         <dependency>
@@ -263,10 +240,6 @@
             <artifactId>wss4j-ws-security-common</artifactId>
             <version>3.0.2</version>
             <exclusions>
-                <exclusion>
-                    <artifactId>bcpkix-jdk15on</artifactId>
-                    <groupId>org.bouncycastle</groupId>
-                </exclusion>
                 <!--conflicts with FitNesse version-->
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -307,7 +280,7 @@
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.23.1</version>
+            <version>3.25.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
