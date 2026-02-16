@@ -60,7 +60,10 @@ To use key vault, create an app registration for this fixture in your Azure AD. 
 For more authentication options, see: [Default Azure Credential docs](https://docs.microsoft.com/en-us/java/api/com.azure.identity.defaultazurecredential?view=azure-java-stable)
 
 ### HiddenSlimSymbolsFixture
-A fixture that lets you assign system property - or environment variable values to slim symbols without exposing them in wiki pages / test results 
+A fixture that lets you assign system property - or environment variable values to slim symbols without exposing them in wiki pages / test results
+
+### NullSafeFreemarkerFixture
+NullSafeFreemarkerFixture extends FreemarkerFixture to preserve null values in generated output. FreeMarker normally drops nulls from maps and Gson omits them from JSON — this fixture works around both by replacing nulls with a sentinel string (__FMNull__) before template processing, and using a serializeNulls-enabled Gson for JSON formatting.
 
 ## Other extra's
 
